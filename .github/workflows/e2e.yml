@@ -1,0 +1,63 @@
+name: E2E Tests
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  e2e-tests:
+    runs-on: ubuntu-latest
+    name: E2E Tests (Playwright)
+    
+    services:
+      backend:
+        image: ghcr.io/${{ github.repository }}:latest
+        options: >-
+          --health-cmd="wget --no-verbose --tries=1 --spider http://localhost:8080/api/v1/health || exit 1"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+        ports:
+          - 8080:8080
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v1
+      
+      - name: Install dependencies
+        working-directory: ./frontend
+        run: bun install
+      
+      - name: Install Playwright browsers
+        working-directory: ./frontend
+        run: bun exec playwright install --with-deps
+      
+      - name: Wait for backend to be ready
+        run: |
+          for i in {1..30}; do
+            if curl -f http://localhost:8080/api/v1/health; then
+              echo "Backend is ready"
+              exit 0
+            fi
+            echo "Waiting for backend... attempt $i"
+            sleep 2
+          done
+          echo "Backend failed to start"
+          exit 1
+      
+      - name: Run E2E tests
+        working-directory: ./frontend
+        run: bun exec playwright test
+      
+      - name: Upload Playwright report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: frontend/playwright-report/
+          retention-days: 30

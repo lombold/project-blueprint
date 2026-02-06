@@ -1,0 +1,61 @@
+# Java/Maven
+target/
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+dependency-reduced-pom.xml
+.flattened-pom.xml
+*.class
+*.jar
+*.war
+*.nar
+!gradle/wrapper/gradle-wrapper.jar
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.DS_Store
+*.iml
+.classpath
+.project
+.settings/
+
+# Node/npm/Bun
+node_modules/
+frontend/dist/
+frontend/.angular/
+frontend/coverage/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+bun.lock
+package-lock.json
+yarn.lock
+
+# Playwright
+frontend/playwright-report/
+frontend/test-results/
+
+# Spring Boot
+spring-boot-devtools.properties
+.env
+.env.local
+.env.*.local
+
+# OS
+.DS_Store
+.AppleDouble
+.LSOverride
+Thumbs.db
+
+# Misc
+*.log
+.gradle
+build/
+dist/
+out/

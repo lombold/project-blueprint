@@ -1,0 +1,56 @@
+version: '3.8'
+
+services:
+  # Spring Boot Backend
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    environment:
+      - JAVA_OPTS=-Xmx512m -Xms256m
+      - SPRING_PROFILES_ACTIVE=dev
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8080/api/v1/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    volumes:
+      - ./backend/target:/app/backend/target
+    networks:
+      - gym-buddy-network
+
+  # Frontend (for development, run separately with `bun run start`)
+  # This is commented out because the frontend is typically run with `bun run start`
+  # during development, but you can uncomment and modify if you want Docker-based frontend
+  # frontend:
+  #   build:
+  #     context: ./frontend
+  #     dockerfile: Dockerfile
+  #   ports:
+  #     - "4200:4200"
+  #   environment:
+  #     - NODE_ENV=development
+  #   volumes:
+  #     - ./frontend/src:/app/src
+  #   networks:
+  #     - gym-buddy-network
+  #   depends_on:
+  #     - backend
+
+networks:
+  gym-buddy-network:
+    driver: bridge
+
+# Usage:
+# Development:
+#   1. Start backend: docker-compose up -d backend
+#   2. In another terminal: cd frontend && bun run start
+#
+# Full stack:
+#   docker-compose up
+#
+# Stop:
+#   docker-compose down
