@@ -15,7 +15,7 @@
 - Maven 3.9+ (required for Java 25 toolchain)
 
 ## 3. Repository Layout & Boundaries
-- `backend/` — Spring Boot hexagonal app: `domain/`, `application/port|service|dto`, `adapter/inbound|outbound`, resources, tests.
+- `backend/` — Spring Boot hexagonal app: `domain/`, `application/port|service`, `adapter/inbound|outbound, dtos, jpa entities, mappers`, resources, tests.
 - `frontend/` — Angular workspace with strict `core/`, `modules/<feature>/{pages,ui,data-access,state,models,util}`, `shared/` for cross-cutting UI/utilities, e2e, Vitest config, Tailwind config.
 - Root: Dockerfile, docker-compose, Playwright config, CI workflows. Do not move these without updating docs.
 
@@ -27,9 +27,64 @@
   - Domain ring has zero Spring/Lombok annotations; value objects and invariants live here.
   - Application ring exposes `*UseCase` inbound ports, orchestrates transactions, depends only on domain.
   - Adapters implement `*Port` interfaces (`adapter/inbound/controller`, `adapter/outbound/persistence`). Map DTOs explicitly; never return JPA entities outside adapters.
+
+### Backend Architecture (Hexagonal)
+
+#### Domain (`backend/src/main/java/.../domain`)
+- **Purpose:** pure business model + rules.
+- **Contains:**
+  - Aggregates/entities, value objects, domain services, domain events (if used)
+  - Invariants, validation, business rules (fail fast)
+  - Domain exceptions (business meaning)
+- **Rules:**
+  - **No framework dependencies** (no Spring, no JPA, no Lombok).
+  - No IO, no HTTP, no persistence concerns.
+  - No DTOs, no JPA entities.
+  - Only depends on JDK (and small pure libs if already allowed).
+
+#### Application (`backend/src/main/java/.../application`)
+- **Purpose:** orchestrates use-cases; coordinates domain + ports.
+- **Structure:**
+  - `application/port/in/*UseCase` (inbound ports / use-case APIs)
+  - `application/port/out/*Port` (outbound ports for persistence, messaging, clocks, etc.)
+  - `application/service/*Service` (use-case implementations)
+- **Rules:**
+  - Depends on **domain** only (and port interfaces).
+  - No Spring MVC annotations in core use-case code (wiring belongs in adapters).
+  - Transactions are defined/handled here (or via adapter configuration), but business rules stay in domain.
+  - Converts between domain types and port-level models if needed (but keep mapping minimal and explicit).
+
+#### Adapters (`backend/src/main/java/.../adapter`)
+- **Purpose:** connect the outside world to application ports (inbound) and implement outbound ports (outbound).
+- **Inbound adapters (`adapter/inbound/...`)**
+  - **Spring controllers** (`@RestController`) exposing HTTP endpoints
+  - Request/response **DTOs**
+  - **DTO mappers**:
+    - DTO → command/request model for `*UseCase`
+    - result/domain → DTO for HTTP response
+  - **Rules:**
+    - Controllers depend on `application/port/in/*UseCase`, not on services directly.
+    - Never expose domain objects “as-is” over HTTP; always map to DTOs.
+
+- **Outbound adapters (`adapter/outbound/persistence/...`)**
+  - **JPA repositories** (Spring Data interfaces)
+  - **JPA entities** (ORM mapping)
+  - **Entity mappers**:
+    - Domain ↔ JPA entity mapping (MapStruct if helpful)
+  - **Rules:**
+    - Implement `application/port/out/*Port`.
+    - JPA entities and repositories must not leak outside outbound persistence adapter.
+    - Application/domain never reference JPA types.
+
+- **General adapter rules**
+  - All framework annotations live here (Spring, JPA, validation annotations on DTOs/entities).
+  - Mapping is explicit (prefer dedicated mapper classes over ad-hoc conversion in controllers/services).
+  - Adapters may depend on Spring + application + domain; the core must not depend on adapters.
+
 - Persistence:
   - Default DB: H2 in-memory via `application.yml`. Keep SQL schema/data in `src/main/resources`.
   - Use MapStruct (1.6.x) for mapping when helpful; configure processors through Maven as already defined.
+
 
 ## 5. Frontend Workflow
 - Package manager: Bun. Run commands from `frontend/`.

@@ -1,4 +1,4 @@
-package com.gymbuddy.application.dto;
+package com.gymbuddy.adapter.inbound.controller.dto;
 
 import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
