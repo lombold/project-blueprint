@@ -15,6 +15,11 @@ public class WorkoutService {
   private final WorkoutPort workoutPort;
 
   public Workout createWorkout(final Workout workout) {
+    // Validate user ID is provided before attempting to save
+    if (workout.getUserId() == null || workout.getUserId() <= 0) {
+      throw new IllegalArgumentException("Valid user ID is required to create a workout");
+    }
+
     final var now = LocalDateTime.now();
     workout.setCreatedAt(now);
     workout.setUpdatedAt(now);
