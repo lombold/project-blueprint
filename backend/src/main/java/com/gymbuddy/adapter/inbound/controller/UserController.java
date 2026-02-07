@@ -30,10 +30,10 @@ public class UserController {
    */
   @GetMapping
   public ResponseEntity<List<UserDTO>> getAllUsers() {
-    List<User> users = userService.getAllUsers();
-    List<UserDTO> userDTOs = users.stream()
+    final var users = userService.getAllUsers();
+    final var userDTOs = users.stream()
         .map(userMapper::toDto)
-        .collect(Collectors.toList());
+        .toList();
     return ResponseEntity.ok(userDTOs);
   }
 
@@ -44,9 +44,9 @@ public class UserController {
    * @return the user
    */
   @GetMapping("/{id}")
-  public ResponseEntity<UserDTO> getUserById(@PathVariable Long id) {
-    User user = userService.getUserById(id);
-    UserDTO userDTO = userMapper.toDto(user);
+  public ResponseEntity<UserDTO> getUserById(@PathVariable final Long id) {
+    final var user = userService.getUserById(id);
+    final var userDTO = userMapper.toDto(user);
     return ResponseEntity.ok(userDTO);
   }
 
@@ -57,10 +57,10 @@ public class UserController {
    * @return the created user
    */
   @PostMapping
-  public ResponseEntity<UserDTO> createUser(@RequestBody UserDTO userDTO) {
-    User user = userMapper.toDomain(userDTO);
-    User createdUser = userService.createUser(user);
-    UserDTO createdDTO = userMapper.toDto(createdUser);
+  public ResponseEntity<UserDTO> createUser(@RequestBody final UserDTO userDTO) {
+    final var user = userMapper.toDomain(userDTO);
+    final var createdUser = userService.createUser(user);
+    final var createdDTO = userMapper.toDto(createdUser);
     return ResponseEntity.status(HttpStatus.CREATED).body(createdDTO);
   }
 
@@ -72,10 +72,10 @@ public class UserController {
    * @return the updated user
    */
   @PutMapping("/{id}")
-  public ResponseEntity<UserDTO> updateUser(@PathVariable Long id, @RequestBody UserDTO userDTO) {
-    User user = userMapper.toDomain(userDTO);
-    User updatedUser = userService.updateUser(id, user);
-    UserDTO updatedDTO = userMapper.toDto(updatedUser);
+  public ResponseEntity<UserDTO> updateUser(@PathVariable final Long id, @RequestBody final UserDTO userDTO) {
+    final var user = userMapper.toDomain(userDTO);
+    final var updatedUser = userService.updateUser(id, user);
+    final var updatedDTO = userMapper.toDto(updatedUser);
     return ResponseEntity.ok(updatedDTO);
   }
 
@@ -86,7 +86,7 @@ public class UserController {
    * @return no content response
    */
   @DeleteMapping("/{id}")
-  public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
+  public ResponseEntity<Void> deleteUser(@PathVariable final Long id) {
     userService.deleteUser(id);
     return ResponseEntity.noContent().build();
   }
