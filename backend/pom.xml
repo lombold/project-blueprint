@@ -16,7 +16,7 @@
   <parent>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-parent</artifactId>
-    <version>3.3.0</version>
+    <version>4.0.0</version>
     <relativePath/>
   </parent>
 
@@ -24,8 +24,8 @@
     <java.version>25</java.version>
     <maven.compiler.release>25</maven.compiler.release>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <archunit.version>1.2.1</archunit.version>
-    <mapstruct.version>1.5.5.Final</mapstruct.version>
+    <archunit.version>1.4.1</archunit.version>
+    <mapstruct.version>1.6.3</mapstruct.version>
   </properties>
 
   <dependencies>

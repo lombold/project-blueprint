@@ -55,7 +55,7 @@ RUN mkdir -p BOOT-INF/classes/static/ui && \
 RUN jar cfm gym-buddy.jar META-INF/MANIFEST.MF -C . .
 
 # Stage 4: Runtime image (minimal JRE)
-FROM eclipse-temurin:25-jre-alpine
+FROM eclipse-temurin:21-jre-alpine
 
 WORKDIR /app
 
