@@ -23,6 +23,8 @@ logging:
   level:
     root: INFO
     com.gymbuddy: DEBUG
+    org.springframework.web: DEBUG
+    org.springframework.boot.web.servlet.error: DEBUG
 
 server:
   port: 8080
