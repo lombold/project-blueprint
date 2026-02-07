@@ -8,10 +8,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-/**
- * JPA entity for Exercise.
- * This is an adapter class that bridges the domain Exercise entity with the database.
- */
 @Entity
 @Table(name = "exercises")
 @Getter
@@ -51,22 +47,4 @@ public class ExerciseJpaEntity {
   @Column(name = "created_at")
   private LocalDateTime createdAt;
 
-  /**
-   * Converts this JPA entity to a domain Exercise entity.
-   *
-   * @return the domain Exercise entity
-   */
-  public com.gymbuddy.domain.entity.Exercise toDomainEntity() {
-    return com.gymbuddy.domain.entity.Exercise.builder()
-        .id(this.id)
-        .workoutId(this.workoutId)
-        .name(this.name)
-        .sets(this.sets)
-        .reps(this.reps)
-        .weightKg(this.weightKg)
-        .notes(this.notes)
-        .orderIndex(this.orderIndex)
-        .createdAt(this.createdAt)
-        .build();
-  }
 }

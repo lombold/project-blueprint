@@ -1,12 +1,12 @@
 package com.gymbuddy.application.service;
 
 import com.gymbuddy.application.dto.UserDTO;
+import com.gymbuddy.application.mapper.UserMapper;
 import com.gymbuddy.application.port.UserPort;
 import com.gymbuddy.domain.entity.User;
 import com.gymbuddy.domain.exception.ResourceNotFoundException;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 public class UserService {
 
   private final UserPort userPort;
+  private final UserMapper userMapper;
 
   /**
    * Creates a new user.
@@ -27,15 +28,13 @@ public class UserService {
    * @return the created user DTO
    */
   public UserDTO createUser(UserDTO userDTO) {
-    User user = new User();
-    user.setUsername(userDTO.getUsername());
-    user.setEmail(userDTO.getEmail());
+    User user = userMapper.toDomain(userDTO);
     user.setCreatedAt(LocalDateTime.now());
     user.setUpdatedAt(LocalDateTime.now());
     user.validate();
 
     User savedUser = userPort.save(user);
-    return mapToDTO(savedUser);
+    return userMapper.toDto(savedUser);
   }
 
   /**
@@ -50,7 +49,7 @@ public class UserService {
         userPort
             .findById(id)
             .orElseThrow(() -> new ResourceNotFoundException("User not found with ID: " + id));
-    return mapToDTO(user);
+    return userMapper.toDto(user);
   }
 
   /**
@@ -59,7 +58,7 @@ public class UserService {
    * @return a list of user DTOs
    */
   public List<UserDTO> getAllUsers() {
-    return userPort.findAll().stream().map(this::mapToDTO).collect(Collectors.toList());
+    return userPort.findAll().stream().map(userMapper::toDto).toList();
   }
 
   /**
@@ -76,13 +75,12 @@ public class UserService {
             .findById(id)
             .orElseThrow(() -> new ResourceNotFoundException("User not found with ID: " + id));
 
-    user.setUsername(userDTO.getUsername());
-    user.setEmail(userDTO.getEmail());
+    userMapper.updateUserFromDto(userDTO, user);
     user.setUpdatedAt(LocalDateTime.now());
     user.validate();
 
     User updatedUser = userPort.save(user);
-    return mapToDTO(updatedUser);
+    return userMapper.toDto(updatedUser);
   }
 
   /**
@@ -98,13 +96,4 @@ public class UserService {
     userPort.deleteById(id);
   }
 
-  private UserDTO mapToDTO(User user) {
-    return UserDTO.builder()
-        .id(user.getId())
-        .username(user.getUsername())
-        .email(user.getEmail())
-        .createdAt(user.getCreatedAt())
-        .updatedAt(user.getUpdatedAt())
-        .build();
-  }
 }

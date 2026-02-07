@@ -10,10 +10,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-/**
- * JPA entity for Workout.
- * This is an adapter class that bridges the domain Workout entity with the database.
- */
 @Entity
 @Table(name = "workouts")
 @Getter
@@ -55,22 +51,4 @@ public class WorkoutJpaEntity {
   @OneToMany(mappedBy = "workout", cascade = CascadeType.ALL, orphanRemoval = true)
   @Builder.Default
   private List<ExerciseJpaEntity> exercises = new ArrayList<>();
-
-  /**
-   * Converts this JPA entity to a domain Workout entity.
-   *
-   * @return the domain Workout entity
-   */
-  public com.gymbuddy.domain.entity.Workout toDomainEntity() {
-    return com.gymbuddy.domain.entity.Workout.builder()
-        .id(this.id)
-        .userId(this.userId)
-        .name(this.name)
-        .description(this.description)
-        .durationMinutes(this.durationMinutes)
-        .exerciseCount(this.exerciseCount)
-        .createdAt(this.createdAt)
-        .updatedAt(this.updatedAt)
-        .build();
-  }
 }

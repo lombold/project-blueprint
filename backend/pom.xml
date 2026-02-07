@@ -26,6 +26,7 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <archunit.version>1.4.1</archunit.version>
     <mapstruct.version>1.6.3</mapstruct.version>
+    <lombok.version>1.18.36</lombok.version>
   </properties>
 
   <dependencies>
@@ -96,7 +97,6 @@
 
   <build>
     <finalName>gym-buddy</finalName>
-
     <plugins>
       <plugin>
         <groupId>org.springframework.boot</groupId>

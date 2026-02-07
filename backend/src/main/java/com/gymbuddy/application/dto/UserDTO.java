@@ -1,6 +1,7 @@
 package com.gymbuddy.application.dto;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -23,5 +24,6 @@ public class UserDTO {
   private String email;
   private LocalDateTime createdAt;
   private LocalDateTime updatedAt;
-  private List<WorkoutDTO> workouts;
+  @Builder.Default
+  private List<WorkoutDTO> workouts = new ArrayList<>();
 }
