@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ApiService } from '../../services/api.service';
 import { Workout } from '../../models/workout.model';
+import { User } from '../../models/user.model';
 
 /**
  * Workouts page component - Track workouts and exercises
@@ -29,6 +30,17 @@ import { Workout } from '../../models/workout.model';
           <h2 class="text-2xl font-bold mb-6 text-gray-900">Create New Workout</h2>
           <form (ngSubmit)="createWorkout()">
             <div class="space-y-4">
+              <select
+                [(ngModel)]="formData.userId"
+                name="userId"
+                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                required
+              >
+                <option value="">Select User</option>
+                <option *ngFor="let user of users()" [value]="user.id">
+                  {{ user.username }}
+                </option>
+              </select>
               <input
                 [(ngModel)]="formData.name"
                 name="name"
@@ -85,6 +97,9 @@ import { Workout } from '../../models/workout.model';
             </div>
             <div class="flex gap-6 text-gray-700">
               <div>
+                <span class="font-semibold">User:</span> {{ getUserName(workout.userId) }}
+              </div>
+              <div>
                 <span class="font-semibold">Duration:</span> {{ workout.durationMinutes || 0 }} min
               </div>
               <div>
@@ -104,16 +119,20 @@ import { Workout } from '../../models/workout.model';
 })
 export class WorkoutsPage implements OnInit {
   workouts = signal<Workout[]>([]);
+  users = signal<User[]>([]);
   isFormOpen = signal(false);
   formData = {
+    userId: null as any,
     name: '',
     description: '',
-    durationMinutes: 0
+    durationMinutes: 0,
+    difficulty: ''
   };
 
   constructor(private apiService: ApiService) {}
 
   ngOnInit(): void {
+    this.loadUsers();
     this.loadWorkouts();
   }
 
@@ -123,15 +142,26 @@ export class WorkoutsPage implements OnInit {
 
   cancelForm(): void {
     this.isFormOpen.set(false);
-    this.formData = { name: '', description: '', durationMinutes: 0 };
+    this.formData = {
+      userId: null,
+      name: '',
+      description: '',
+      durationMinutes: 0,
+      difficulty: ''
+    };
   }
 
   createWorkout(): void {
+    if (!this.formData.userId) {
+      alert('Please select a user');
+      return;
+    }
+
     const newWorkout: Workout = {
-      userId: 1, // Default user ID for now
+      userId: this.formData.userId,
       name: this.formData.name,
       description: this.formData.description,
-      durationMinutes: this.formData.durationMinutes
+      durationMinutes: this.formData.durationMinutes,
     };
 
     this.apiService.createWorkout(newWorkout).subscribe({
@@ -157,5 +187,17 @@ export class WorkoutsPage implements OnInit {
       next: (workouts) => this.workouts.set(workouts),
       error: (err) => console.error('Error loading workouts:', err)
     });
+  }
+
+  private loadUsers(): void {
+    this.apiService.getUsers().subscribe({
+      next: (users) => this.users.set(users),
+      error: (err) => console.error('Error loading users:', err)
+    });
+  }
+
+  getUserName(userId: number): string {
+    const user = this.users().find(u => u.id === userId);
+    return user ? user.username : 'Unknown User';
   }
 }
