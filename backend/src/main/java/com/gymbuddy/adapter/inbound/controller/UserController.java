@@ -1,7 +1,9 @@
 package com.gymbuddy.adapter.inbound.controller;
 
-import com.gymbuddy.application.dto.UserDTO;
+import com.gymbuddy.adapter.inbound.dto.UserRequestDto;
+import com.gymbuddy.adapter.inbound.dto.UserResponseDto;
 import com.gymbuddy.application.service.UserService;
+import com.gymbuddy.domain.entity.User;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -26,9 +28,9 @@ public class UserController {
    * @return the created user with 201 status
    */
   @PostMapping
-  public ResponseEntity<UserDTO> createUser(@RequestBody UserDTO userDTO) {
-    UserDTO created = userService.createUser(userDTO);
-    return ResponseEntity.status(HttpStatus.CREATED).body(created);
+  public ResponseEntity<UserResponseDto> createUser(@RequestBody UserRequestDto userDTO) {
+    User createdUser = userService.createUser(toDomain(userDTO));
+    return ResponseEntity.status(HttpStatus.CREATED).body(UserResponseDto.fromDomain(createdUser));
   }
 
   /**
@@ -38,8 +40,8 @@ public class UserController {
    * @return the user data
    */
   @GetMapping("/{id}")
-  public ResponseEntity<UserDTO> getUser(@PathVariable Long id) {
-    return ResponseEntity.ok(userService.getUserById(id));
+  public ResponseEntity<UserResponseDto> getUser(@PathVariable Long id) {
+    return ResponseEntity.ok(UserResponseDto.fromDomain(userService.getUserById(id)));
   }
 
   /**
@@ -48,8 +50,8 @@ public class UserController {
    * @return list of all users
    */
   @GetMapping
-  public ResponseEntity<List<UserDTO>> getAllUsers() {
-    return ResponseEntity.ok(userService.getAllUsers());
+  public ResponseEntity<List<UserResponseDto>> getAllUsers() {
+    return ResponseEntity.ok(userService.getAllUsers().stream().map(UserResponseDto::fromDomain).toList());
   }
 
   /**
@@ -60,8 +62,16 @@ public class UserController {
    * @return the updated user
    */
   @PutMapping("/{id}")
-  public ResponseEntity<UserDTO> updateUser(@PathVariable Long id, @RequestBody UserDTO userDTO) {
-    return ResponseEntity.ok(userService.updateUser(id, userDTO));
+  public ResponseEntity<UserResponseDto> updateUser(@PathVariable Long id, @RequestBody UserRequestDto userDTO) {
+    User updated = userService.updateUser(id, toDomain(userDTO));
+    return ResponseEntity.ok(UserResponseDto.fromDomain(updated));
+  }
+
+  private User toDomain(UserRequestDto dto) {
+    User user = new User();
+    user.setUsername(dto.getUsername());
+    user.setEmail(dto.getEmail());
+    return user;
   }
 
   /**
