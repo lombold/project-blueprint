@@ -14,15 +14,15 @@ public class WorkoutService {
 
   private final WorkoutPort workoutPort;
 
-  public Workout createWorkout(Workout workout) {
-    LocalDateTime now = LocalDateTime.now();
+  public Workout createWorkout(final Workout workout) {
+    final var now = LocalDateTime.now();
     workout.setCreatedAt(now);
     workout.setUpdatedAt(now);
     workout.validate();
     return workoutPort.save(workout);
   }
 
-  public Workout getWorkoutById(Long id) {
+  public Workout getWorkoutById(final Long id) {
     return workoutPort
         .findById(id)
         .orElseThrow(() -> new ResourceNotFoundException("Workout not found with ID: " + id));
@@ -32,12 +32,12 @@ public class WorkoutService {
     return workoutPort.findAll();
   }
 
-  public List<Workout> getWorkoutsByUserId(Long userId) {
+  public List<Workout> getWorkoutsByUserId(final Long userId) {
     return workoutPort.findByUserId(userId);
   }
 
-  public Workout updateWorkout(Long id, Workout workoutUpdates) {
-    Workout existingWorkout = getWorkoutById(id);
+  public Workout updateWorkout(final Long id, final Workout workoutUpdates) {
+    final var existingWorkout = getWorkoutById(id);
     if (workoutUpdates.getName() != null) {
       existingWorkout.setName(workoutUpdates.getName());
     }
@@ -52,7 +52,7 @@ public class WorkoutService {
     return workoutPort.save(existingWorkout);
   }
 
-  public void deleteWorkout(Long id) {
+  public void deleteWorkout(final Long id) {
     if (workoutPort.findById(id).isEmpty()) {
       throw new ResourceNotFoundException("Workout not found with ID: " + id);
     }
