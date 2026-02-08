@@ -1,0 +1,335 @@
+openapi: 3.0.3
+info:
+  title: Gym Buddy API
+  version: 1.0.0
+  description: API-first specification for the Gym Buddy application.
+servers:
+  - url: /api/v1
+paths:
+  /users:
+    get:
+      tags: [Users]
+      operationId: listUsers
+      summary: List users
+      responses:
+        "200":
+          description: List of users
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/User"
+    post:
+      tags: [Users]
+      operationId: createUser
+      summary: Create a user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/User"
+      responses:
+        "201":
+          description: User created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+  /users/{id}:
+    get:
+      tags: [Users]
+      operationId: getUserById
+      summary: Get a user by id
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        "200":
+          description: User details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "404":
+          description: User not found
+    put:
+      tags: [Users]
+      operationId: updateUser
+      summary: Update a user
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/User"
+      responses:
+        "200":
+          description: User updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "404":
+          description: User not found
+    delete:
+      tags: [Users]
+      operationId: deleteUser
+      summary: Delete a user
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        "204":
+          description: User deleted
+        "404":
+          description: User not found
+  /users/{userId}/workouts:
+    get:
+      tags: [Workouts]
+      operationId: listWorkoutsByUser
+      summary: List workouts by user
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        "200":
+          description: List of workouts for user
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Workout"
+  /workouts:
+    get:
+      tags: [Workouts]
+      operationId: listWorkouts
+      summary: List workouts
+      responses:
+        "200":
+          description: List of workouts
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Workout"
+    post:
+      tags: [Workouts]
+      operationId: createWorkout
+      summary: Create a workout
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Workout"
+      responses:
+        "201":
+          description: Workout created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Workout"
+  /workouts/{id}:
+    get:
+      tags: [Workouts]
+      operationId: getWorkoutById
+      summary: Get a workout by id
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        "200":
+          description: Workout details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Workout"
+        "404":
+          description: Workout not found
+    put:
+      tags: [Workouts]
+      operationId: updateWorkout
+      summary: Update a workout
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Workout"
+      responses:
+        "200":
+          description: Workout updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Workout"
+        "404":
+          description: Workout not found
+    delete:
+      tags: [Workouts]
+      operationId: deleteWorkout
+      summary: Delete a workout
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        "204":
+          description: Workout deleted
+        "404":
+          description: Workout not found
+  /health:
+    get:
+      tags: [Health]
+      operationId: getHealth
+      summary: Health check
+      responses:
+        "200":
+          description: Health status
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthStatus"
+components:
+  schemas:
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        username:
+          type: string
+        email:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        workouts:
+          type: array
+          items:
+            $ref: "#/components/schemas/Workout"
+      required:
+        - username
+        - email
+    Workout:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        userId:
+          type: integer
+          format: int64
+        name:
+          type: string
+        description:
+          type: string
+        durationMinutes:
+          type: integer
+          format: int32
+        exerciseCount:
+          type: integer
+          format: int32
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        exercises:
+          type: array
+          items:
+            $ref: "#/components/schemas/Exercise"
+      required:
+        - userId
+        - name
+    Exercise:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        workoutId:
+          type: integer
+          format: int64
+        name:
+          type: string
+        sets:
+          type: integer
+          format: int32
+        reps:
+          type: integer
+          format: int32
+        weightKg:
+          type: number
+          format: double
+        notes:
+          type: string
+        orderIndex:
+          type: integer
+          format: int32
+        createdAt:
+          type: string
+          format: date-time
+      required:
+        - workoutId
+        - name
+    HealthStatus:
+      type: object
+      properties:
+        status:
+          type: string
+        application:
+          type: string
+        version:
+          type: string
+        timestamp:
+          type: string
+          format: date-time
+      required:
+        - status
+        - application
+        - version
+        - timestamp
+

@@ -1,8 +1,8 @@
 package com.gymbuddy.adapter.inbound.controller;
 
+import com.gymbuddy.adapter.inbound.controller.dto.HealthStatus;
+import java.time.LocalDateTime;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -10,21 +10,20 @@ import org.springframework.web.bind.annotation.RestController;
  * Returns application status and version information.
  */
 @RestController
-@RequestMapping("/api/v1/health")
-public class HealthController {
+public class HealthController implements HealthApi {
 
   /**
    * Returns health status of the application.
    *
    * @return health status response
    */
-  @GetMapping
-  public ResponseEntity<?> health() {
-    return ResponseEntity.ok().body(
-        java.util.Map.of(
-            "status", "UP",
-            "application", "gym-buddy",
-            "version", "1.0.0",
-            "timestamp", java.time.LocalDateTime.now()));
+  @Override
+  public ResponseEntity<HealthStatus> getHealth() {
+    final var status = new HealthStatus()
+        .status("UP")
+        .application("gym-buddy")
+        .version("1.0.0")
+        .timestamp(LocalDateTime.now());
+    return ResponseEntity.ok(status);
   }
 }
