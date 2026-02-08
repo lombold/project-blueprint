@@ -13,6 +13,8 @@ import com.gymbuddy.domain.exception.ResourceNotFoundException;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
+
+import com.gymbuddy.domain.value.UserId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -52,7 +54,7 @@ class WorkoutControllerTest {
     // Setup domain workouts
     workout1 = Workout.builder()
         .id(1L)
-        .userId(1L)
+        .userId(UserId.of(1L))
         .name("Push Day")
         .description("Chest, shoulders, triceps")
         .durationMinutes(60)
@@ -63,7 +65,7 @@ class WorkoutControllerTest {
 
     workout2 = Workout.builder()
         .id(2L)
-        .userId(1L)
+        .userId(UserId.of(1L))
         .name("Pull Day")
         .description("Back, biceps")
         .durationMinutes(45)
@@ -177,7 +179,7 @@ class WorkoutControllerTest {
         .build();
 
     Workout createWorkout = Workout.builder()
-        .userId(1L)
+        .userId(UserId.of(1L))
         .name("Leg Day")
         .description("Squats, lunges")
         .durationMinutes(50)
@@ -186,7 +188,7 @@ class WorkoutControllerTest {
     LocalDateTime now = LocalDateTime.now();
     Workout createdWorkout = Workout.builder()
         .id(3L)
-        .userId(1L)
+        .userId(UserId.of(1L))
         .name("Leg Day")
         .description("Squats, lunges")
         .durationMinutes(50)
@@ -241,7 +243,7 @@ class WorkoutControllerTest {
     LocalDateTime updatedAt = LocalDateTime.now();
     Workout updatedWorkout = Workout.builder()
         .id(1L)
-        .userId(1L)
+        .userId(UserId.of(1L))
         .name("Updated Push Day")
         .description("Updated description")
         .durationMinutes(75)

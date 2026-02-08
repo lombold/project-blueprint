@@ -49,11 +49,11 @@ class UserControllerTest {
 
   @BeforeEach
   void setUp() {
-    LocalDateTime now = LocalDateTime.now();
+    final var now = LocalDateTime.now();
 
     // Setup domain users
     user1 = User.builder()
-        .id(1L)
+        .id(UserId.of(1L))
         .username("johndoe")
         .email("john@example.com")
         .createdAt(now)
@@ -61,7 +61,7 @@ class UserControllerTest {
         .build();
 
     user2 = User.builder()
-        .id(2L)
+        .id(UserId.of(2L))
         .username("janedoe")
         .email("jane@example.com")
         .createdAt(now)
@@ -70,7 +70,7 @@ class UserControllerTest {
 
     // Setup DTOs
     userDTO1 = UserDTO.builder()
-        .id(1L)
+        .id(UserId.of(1L))
         .username("johndoe")
         .email("john@example.com")
         .createdAt(now)
@@ -78,7 +78,7 @@ class UserControllerTest {
         .build();
 
     userDTO2 = UserDTO.builder()
-        .id(2L)
+        .id(UserId.of(2L))
         .username("janedoe")
         .email("jane@example.com")
         .createdAt(now)
@@ -89,13 +89,13 @@ class UserControllerTest {
   @Test
   void shouldGetAllUsers() {
     // Given
-    List<User> users = Arrays.asList(user1, user2);
+    final var users = Arrays.asList(user1, user2);
     when(userService.getAllUsers()).thenReturn(users);
     when(userMapper.toDto(user1)).thenReturn(userDTO1);
     when(userMapper.toDto(user2)).thenReturn(userDTO2);
 
     // When
-    ResponseEntity<List<UserDTO>> response = userController.getAllUsers();
+    final var response = userController.getAllUsers();
 
     // Then
     assertNotNull(response);
@@ -113,13 +113,13 @@ class UserControllerTest {
     when(userMapper.toDto(user1)).thenReturn(userDTO1);
 
     // When
-    ResponseEntity<UserDTO> response = userController.getUserById(1L);
+    final var response = userController.getUserById(1L);
 
     // Then
     assertNotNull(response);
     assertEquals(HttpStatus.OK, response.getStatusCode());
     assertNotNull(response.getBody());
-    assertEquals(1L, response.getBody().getId());
+    assertEquals(UserId.of(1L), response.getBody().getId());
     assertEquals("johndoe", response.getBody().getUsername());
     assertEquals("john@example.com", response.getBody().getEmail());
   }
@@ -139,26 +139,26 @@ class UserControllerTest {
   @Test
   void shouldCreateUser() {
     // Given
-    UserDTO createDTO = UserDTO.builder()
+    final var createDTO = UserDTO.builder()
         .username("newuser")
         .email("newuser@example.com")
         .build();
 
-    User createUser = User.builder()
+    final var createUser = User.builder()
         .username("newuser")
         .email("newuser@example.com")
         .build();
 
-    User createdUser = User.builder()
-        .id(3L)
+    final var createdUser = User.builder()
+        .id(UserId.of(3L))
         .username("newuser")
         .email("newuser@example.com")
         .createdAt(LocalDateTime.now())
         .updatedAt(LocalDateTime.now())
         .build();
 
-    UserDTO createdDTO = UserDTO.builder()
-        .id(3L)
+    final var createdDTO = UserDTO.builder()
+        .id(UserId.of(3L))
         .username("newuser")
         .email("newuser@example.com")
         .createdAt(createdUser.getCreatedAt())
@@ -170,13 +170,13 @@ class UserControllerTest {
     when(userMapper.toDto(createdUser)).thenReturn(createdDTO);
 
     // When
-    ResponseEntity<UserDTO> response = userController.createUser(createDTO);
+    final var response = userController.createUser(createDTO);
 
     // Then
     assertNotNull(response);
     assertEquals(HttpStatus.CREATED, response.getStatusCode());
     assertNotNull(response.getBody());
-    assertEquals(3L, response.getBody().getId());
+    assertEquals(UserId.of(3L), response.getBody().getId());
     assertEquals("newuser", response.getBody().getUsername());
     assertEquals("newuser@example.com", response.getBody().getEmail());
   }
@@ -184,26 +184,26 @@ class UserControllerTest {
   @Test
   void shouldUpdateUser() {
     // Given
-    UserDTO updateDTO = UserDTO.builder()
+    final var updateDTO = UserDTO.builder()
         .username("updateduser")
         .email("updated@example.com")
         .build();
 
-    User updateUser = User.builder()
+    final var updateUser = User.builder()
         .username("updateduser")
         .email("updated@example.com")
         .build();
 
-    User updatedUser = User.builder()
-        .id(1L)
+    final var updatedUser = User.builder()
+        .id(UserId.of(1L))
         .username("updateduser")
         .email("updated@example.com")
         .createdAt(user1.getCreatedAt())
         .updatedAt(LocalDateTime.now())
         .build();
 
-    UserDTO updatedDTO = UserDTO.builder()
-        .id(1L)
+    final var updatedDTO = UserDTO.builder()
+        .id(UserId.of(1L))
         .username("updateduser")
         .email("updated@example.com")
         .createdAt(user1.getCreatedAt())
@@ -215,13 +215,13 @@ class UserControllerTest {
     when(userMapper.toDto(updatedUser)).thenReturn(updatedDTO);
 
     // When
-    ResponseEntity<UserDTO> response = userController.updateUser(1L, updateDTO);
+    final var response = userController.updateUser(1L, updateDTO);
 
     // Then
     assertNotNull(response);
     assertEquals(HttpStatus.OK, response.getStatusCode());
     assertNotNull(response.getBody());
-    assertEquals(1L, response.getBody().getId());
+    assertEquals(UserId.of(1L), response.getBody().getId());
     assertEquals("updateduser", response.getBody().getUsername());
     assertEquals("updated@example.com", response.getBody().getEmail());
   }
@@ -229,10 +229,10 @@ class UserControllerTest {
   @Test
   void shouldDeleteUser() {
     // Given
-    doNothing().when(userService).deleteUser(1L);
+    doNothing().when(userService).deleteUser(UserId.of(1L));
 
     // When
-    ResponseEntity<Void> response = userController.deleteUser(1L);
+    final var response = userController.deleteUser(1L);
 
     // Then
     assertNotNull(response);
