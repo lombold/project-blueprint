@@ -4,6 +4,16 @@
   "cli": {
     "packageManager": "bun"
   },
+  "schematics": {
+    "@schematics/angular": {
+      "component": {
+        "changeDetection": "OnPush",
+        "style": "scss",
+        "inlineStyle": true,
+        "inlineTemplate": true
+      }
+    }
+  },
   "newProjectRoot": "projects",
   "projects": {
     "frontend": {
