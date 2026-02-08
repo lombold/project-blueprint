@@ -6,6 +6,8 @@ import com.gymbuddy.domain.entity.User;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
+import com.gymbuddy.domain.value.UserId;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -24,8 +26,8 @@ public class UserRepositoryAdapter implements UserPort {
   }
 
   @Override
-  public Optional<User> findById(Long id) {
-    return userJpaRepository.findById(id).map(userJpaMapper::toDomain);
+  public Optional<User> findById(UserId id) {
+    return userJpaRepository.findById(id.toLong()).map(userJpaMapper::toDomain);
   }
 
   @Override
@@ -42,7 +44,7 @@ public class UserRepositoryAdapter implements UserPort {
   }
 
   @Override
-  public void deleteById(Long id) {
-    userJpaRepository.deleteById(id);
+  public void deleteById(UserId id) {
+    userJpaRepository.deleteById(id.toLong());
   }
 }

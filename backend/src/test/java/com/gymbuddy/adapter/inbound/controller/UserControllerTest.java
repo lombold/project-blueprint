@@ -13,6 +13,8 @@ import com.gymbuddy.domain.exception.ResourceNotFoundException;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
+
+import com.gymbuddy.domain.value.UserId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -107,7 +109,7 @@ class UserControllerTest {
   @Test
   void shouldGetUserById() {
     // Given
-    when(userService.getUserById(1L)).thenReturn(user1);
+    when(userService.getUserById(UserId.of(1L))).thenReturn(user1);
     when(userMapper.toDto(user1)).thenReturn(userDTO1);
 
     // When
@@ -125,7 +127,7 @@ class UserControllerTest {
   @Test
   void shouldReturn404WhenUserNotFound() {
     // Given
-    when(userService.getUserById(999L))
+    when(userService.getUserById(UserId.of(999L)))
         .thenThrow(new ResourceNotFoundException("User not found with ID: 999"));
 
     // When & Then
@@ -209,7 +211,7 @@ class UserControllerTest {
         .build();
 
     when(userMapper.toDomain(any(UserDTO.class))).thenReturn(updateUser);
-    when(userService.updateUser(anyLong(), any(User.class))).thenReturn(updatedUser);
+    when(userService.updateUser(any(UserId.class), any(User.class))).thenReturn(updatedUser);
     when(userMapper.toDto(updatedUser)).thenReturn(updatedDTO);
 
     // When
@@ -240,12 +242,12 @@ class UserControllerTest {
   @Test
   void shouldThrowExceptionWhenDeletingNonExistentUser() {
     // Given
-    when(userService.getUserById(999L))
+    when(userService.getUserById(UserId.of(999L)))
         .thenThrow(new ResourceNotFoundException("User not found with ID: 999"));
 
     // When & Then
     assertThrows(ResourceNotFoundException.class, () -> {
-      userService.getUserById(999L);
+      userService.getUserById(UserId.of(999L));
     });
   }
 }

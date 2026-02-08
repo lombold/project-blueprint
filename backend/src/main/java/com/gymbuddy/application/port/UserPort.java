@@ -1,6 +1,8 @@
 package com.gymbuddy.application.port;
 
 import com.gymbuddy.domain.entity.User;
+import com.gymbuddy.domain.value.UserId;
+
 import java.util.List;
 import java.util.Optional;
 
@@ -24,7 +26,7 @@ public interface UserPort {
    * @param id the user ID
    * @return an Optional containing the user if found
    */
-  Optional<User> findById(Long id);
+  Optional<User> findById(UserId id);
 
   /**
    * Retrieves all users.
@@ -46,5 +48,5 @@ public interface UserPort {
    *
    * @param id the user ID
    */
-  void deleteById(Long id);
+  void deleteById(UserId id);
 }

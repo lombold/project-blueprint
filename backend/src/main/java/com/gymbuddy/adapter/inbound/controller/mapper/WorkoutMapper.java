@@ -4,7 +4,7 @@ import com.gymbuddy.adapter.inbound.controller.dto.WorkoutDTO;
 import com.gymbuddy.domain.entity.Workout;
 import org.mapstruct.Mapper;
 
-@Mapper(componentModel = "spring", uses = ExerciseMapper.class)
+@Mapper(componentModel = "spring", uses = {ExerciseMapper.class, UserIdMapper.class})
 public interface WorkoutMapper {
 
   WorkoutDTO toDto(Workout workout);

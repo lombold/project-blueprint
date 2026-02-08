@@ -1,5 +1,6 @@
 package com.gymbuddy.domain.entity;
 
+import com.gymbuddy.domain.value.UserId;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -13,7 +14,7 @@ import java.util.List;
 @Builder
 public class User {
 
-  private Long id;
+  private UserId id;
   private String username;
   private String email;
   private LocalDateTime createdAt;

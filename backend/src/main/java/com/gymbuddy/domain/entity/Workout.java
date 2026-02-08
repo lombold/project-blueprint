@@ -3,6 +3,7 @@ package com.gymbuddy.domain.entity;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import com.gymbuddy.domain.value.UserId;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -21,8 +22,7 @@ import lombok.Setter;
 public class Workout {
 
   private Long id;
-  private Long userId;
-  private User user;
+  private UserId userId;
   private String name;
   private String description;
   private Integer durationMinutes;
@@ -42,7 +42,7 @@ public class Workout {
     if (name == null || name.isBlank()) {
       throw new IllegalArgumentException("Workout name cannot be empty");
     }
-    if (userId == null || userId <= 0) {
+    if (userId == null) {
       throw new IllegalArgumentException("User ID must be valid");
     }
   }

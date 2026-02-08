@@ -5,6 +5,8 @@ import com.gymbuddy.domain.entity.User;
 import com.gymbuddy.domain.exception.ResourceNotFoundException;
 import java.time.LocalDateTime;
 import java.util.List;
+
+import com.gymbuddy.domain.value.UserId;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -22,7 +24,7 @@ public class UserService {
     return userPort.save(user);
   }
 
-  public User getUserById(Long id) {
+  public User getUserById(UserId id) {
     return userPort
         .findById(id)
         .orElseThrow(() -> new ResourceNotFoundException("User not found with ID: " + id));
@@ -32,7 +34,7 @@ public class UserService {
     return userPort.findAll();
   }
 
-  public User updateUser(Long id, User userUpdates) {
+  public User updateUser(UserId id, User userUpdates) {
     User existingUser = getUserById(id);
     if (userUpdates.getUsername() != null) {
       existingUser.setUsername(userUpdates.getUsername());
@@ -45,7 +47,7 @@ public class UserService {
     return userPort.save(existingUser);
   }
 
-  public void deleteUser(Long id) {
+  public void deleteUser(UserId id) {
     if (userPort.findById(id).isEmpty()) {
       throw new ResourceNotFoundException("User not found with ID: " + id);
     }

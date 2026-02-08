@@ -6,6 +6,8 @@ import com.gymbuddy.application.service.UserService;
 import com.gymbuddy.domain.entity.User;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import com.gymbuddy.domain.value.UserId;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -45,7 +47,7 @@ public class UserController {
    */
   @GetMapping("/{id}")
   public ResponseEntity<UserDTO> getUserById(@PathVariable final Long id) {
-    final var user = userService.getUserById(id);
+    final var user = userService.getUserById(UserId.of(id));
     final var userDTO = userMapper.toDto(user);
     return ResponseEntity.ok(userDTO);
   }
@@ -74,7 +76,7 @@ public class UserController {
   @PutMapping("/{id}")
   public ResponseEntity<UserDTO> updateUser(@PathVariable final Long id, @RequestBody final UserDTO userDTO) {
     final var user = userMapper.toDomain(userDTO);
-    final var updatedUser = userService.updateUser(id, user);
+    final var updatedUser = userService.updateUser(UserId.of(id), user);
     final var updatedDTO = userMapper.toDto(updatedUser);
     return ResponseEntity.ok(updatedDTO);
   }
@@ -87,7 +89,7 @@ public class UserController {
    */
   @DeleteMapping("/{id}")
   public ResponseEntity<Void> deleteUser(@PathVariable final Long id) {
-    userService.deleteUser(id);
+    userService.deleteUser(UserId.of(id));
     return ResponseEntity.noContent().build();
   }
 }

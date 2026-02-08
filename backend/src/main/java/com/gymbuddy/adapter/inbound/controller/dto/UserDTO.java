@@ -3,6 +3,7 @@ package com.gymbuddy.adapter.inbound.controller.dto;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import com.gymbuddy.domain.value.UserId;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -19,7 +20,7 @@ import lombok.Setter;
 @Builder
 public class UserDTO {
 
-  private Long id;
+  private UserId id;
   private String username;
   private String email;
   private LocalDateTime createdAt;
@@ -27,4 +28,3 @@ public class UserDTO {
   @Builder.Default
   private List<WorkoutDTO> workouts = new ArrayList<>();
 }
-

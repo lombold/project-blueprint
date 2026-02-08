@@ -16,7 +16,7 @@ public class WorkoutService {
 
   public Workout createWorkout(final Workout workout) {
     // Validate user ID is provided before attempting to save
-    if (workout.getUserId() == null || workout.getUserId() <= 0) {
+    if (workout.getUserId() == null || workout.getUserId().toLong() <= 0) {
       throw new IllegalArgumentException("Valid user ID is required to create a workout");
     }
 
