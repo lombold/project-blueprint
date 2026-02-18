@@ -3,7 +3,7 @@ package com.gymbuddy.application.service;
 import com.gymbuddy.application.port.UserPort;
 import com.gymbuddy.domain.entity.User;
 import com.gymbuddy.domain.exception.ResourceNotFoundException;
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.List;
 
 import com.gymbuddy.domain.value.UserId;
@@ -17,7 +17,7 @@ public class UserService {
   private final UserPort userPort;
 
   public User createUser(User user) {
-    LocalDateTime now = LocalDateTime.now();
+    OffsetDateTime now = OffsetDateTime.now();
     user.setCreatedAt(now);
     user.setUpdatedAt(now);
     user.validate();
@@ -42,7 +42,7 @@ public class UserService {
     if (userUpdates.getEmail() != null) {
       existingUser.setEmail(userUpdates.getEmail());
     }
-    existingUser.setUpdatedAt(LocalDateTime.now());
+    existingUser.setUpdatedAt(OffsetDateTime.now());
     existingUser.validate();
     return userPort.save(existingUser);
   }

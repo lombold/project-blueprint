@@ -1,18 +1,17 @@
 package com.gymbuddy.adapter.inbound.controller;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 
-import com.gymbuddy.adapter.inbound.controller.dto.UserDTO;
+import com.gymbuddy.adapter.inbound.controller.dto.UserDto;
+import com.gymbuddy.adapter.inbound.controller.mapper.UserController;
 import com.gymbuddy.adapter.inbound.controller.mapper.UserMapper;
 import com.gymbuddy.application.service.UserService;
 import com.gymbuddy.domain.entity.User;
 import com.gymbuddy.domain.exception.ResourceNotFoundException;
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.Arrays;
-import java.util.List;
 
 import com.gymbuddy.domain.value.UserId;
 import org.junit.jupiter.api.BeforeEach;
@@ -22,7 +21,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -44,12 +42,12 @@ class UserControllerTest {
 
   private User user1;
   private User user2;
-  private UserDTO userDTO1;
-  private UserDTO userDTO2;
+  private UserDto UserDto1;
+  private UserDto UserDto2;
 
   @BeforeEach
   void setUp() {
-    final var now = LocalDateTime.now();
+    final var now = OffsetDateTime.now();
 
     // Setup domain users
     user1 = User.builder()
@@ -69,7 +67,7 @@ class UserControllerTest {
         .build();
 
     // Setup DTOs
-    userDTO1 = UserDTO.builder()
+    UserDto1 = UserDto.builder()
         .id(UserId.of(1L))
         .username("johndoe")
         .email("john@example.com")
@@ -77,7 +75,7 @@ class UserControllerTest {
         .updatedAt(now)
         .build();
 
-    userDTO2 = UserDTO.builder()
+    UserDto2 = UserDto.builder()
         .id(UserId.of(2L))
         .username("janedoe")
         .email("jane@example.com")
@@ -91,8 +89,8 @@ class UserControllerTest {
     // Given
     final var users = Arrays.asList(user1, user2);
     when(userService.getAllUsers()).thenReturn(users);
-    when(userMapper.toDto(user1)).thenReturn(userDTO1);
-    when(userMapper.toDto(user2)).thenReturn(userDTO2);
+    when(userMapper.toDto(user1)).thenReturn(UserDto1);
+    when(userMapper.toDto(user2)).thenReturn(UserDto2);
 
     // When
     final var response = userController.getAllUsers();
@@ -110,7 +108,7 @@ class UserControllerTest {
   void shouldGetUserById() {
     // Given
     when(userService.getUserById(UserId.of(1L))).thenReturn(user1);
-    when(userMapper.toDto(user1)).thenReturn(userDTO1);
+    when(userMapper.toDto(user1)).thenReturn(UserDto1);
 
     // When
     final var response = userController.getUserById(1L);
@@ -139,7 +137,7 @@ class UserControllerTest {
   @Test
   void shouldCreateUser() {
     // Given
-    final var createDTO = UserDTO.builder()
+    final var createDTO = UserDto.builder()
         .username("newuser")
         .email("newuser@example.com")
         .build();
@@ -153,11 +151,11 @@ class UserControllerTest {
         .id(UserId.of(3L))
         .username("newuser")
         .email("newuser@example.com")
-        .createdAt(LocalDateTime.now())
-        .updatedAt(LocalDateTime.now())
+        .createdAt(OffsetDateTime.now())
+        .updatedAt(OffsetDateTime.now())
         .build();
 
-    final var createdDTO = UserDTO.builder()
+    final var createdDTO = UserDto.builder()
         .id(UserId.of(3L))
         .username("newuser")
         .email("newuser@example.com")
@@ -165,7 +163,7 @@ class UserControllerTest {
         .updatedAt(createdUser.getUpdatedAt())
         .build();
 
-    when(userMapper.toDomain(any(UserDTO.class))).thenReturn(createUser);
+    when(userMapper.toDomain(any(UserDto.class))).thenReturn(createUser);
     when(userService.createUser(any(User.class))).thenReturn(createdUser);
     when(userMapper.toDto(createdUser)).thenReturn(createdDTO);
 
@@ -184,7 +182,7 @@ class UserControllerTest {
   @Test
   void shouldUpdateUser() {
     // Given
-    final var updateDTO = UserDTO.builder()
+    final var updateDTO = UserDto.builder()
         .username("updateduser")
         .email("updated@example.com")
         .build();
@@ -199,10 +197,10 @@ class UserControllerTest {
         .username("updateduser")
         .email("updated@example.com")
         .createdAt(user1.getCreatedAt())
-        .updatedAt(LocalDateTime.now())
+        .updatedAt(OffsetDateTime.now())
         .build();
 
-    final var updatedDTO = UserDTO.builder()
+    final var updatedDTO = UserDto.builder()
         .id(UserId.of(1L))
         .username("updateduser")
         .email("updated@example.com")
@@ -210,7 +208,7 @@ class UserControllerTest {
         .updatedAt(updatedUser.getUpdatedAt())
         .build();
 
-    when(userMapper.toDomain(any(UserDTO.class))).thenReturn(updateUser);
+    when(userMapper.toDomain(any(UserDto.class))).thenReturn(updateUser);
     when(userService.updateUser(any(UserId.class), any(User.class))).thenReturn(updatedUser);
     when(userMapper.toDto(updatedUser)).thenReturn(updatedDTO);
 

@@ -2,9 +2,14 @@ package com.gymbuddy.adapter.config;
 
 import com.gymbuddy.domain.exception.DomainException;
 import com.gymbuddy.domain.exception.ResourceNotFoundException;
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.HashMap;
 import java.util.Map;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -34,7 +39,7 @@ public class GlobalExceptionHandler {
         ErrorResponse.builder()
             .status(HttpStatus.NOT_FOUND.value())
             .message(ex.getMessage())
-            .timestamp(LocalDateTime.now())
+            .timestamp(OffsetDateTime.now())
             .build();
     return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
   }
@@ -54,7 +59,7 @@ public class GlobalExceptionHandler {
         ErrorResponse.builder()
             .status(HttpStatus.BAD_REQUEST.value())
             .message(ex.getMessage())
-            .timestamp(LocalDateTime.now())
+            .timestamp(OffsetDateTime.now())
             .build();
     return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
   }
@@ -74,7 +79,7 @@ public class GlobalExceptionHandler {
         ErrorResponse.builder()
             .status(HttpStatus.BAD_REQUEST.value())
             .message(ex.getMessage())
-            .timestamp(LocalDateTime.now())
+            .timestamp(OffsetDateTime.now())
             .build();
     return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
   }
@@ -93,19 +98,19 @@ public class GlobalExceptionHandler {
         ErrorResponse.builder()
             .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
             .message("An internal server error occurred")
-            .timestamp(LocalDateTime.now())
+            .timestamp(OffsetDateTime.now())
             .build();
     return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
   }
 
   /** Error response DTO. */
-  @lombok.Getter
-  @lombok.Setter
-  @lombok.AllArgsConstructor
-  @lombok.Builder
+  @Getter
+  @Setter
+  @AllArgsConstructor
+  @Builder
    static class ErrorResponse {
     private int status;
     private String message;
-    private LocalDateTime timestamp;
+    private OffsetDateTime timestamp;
   }
 }

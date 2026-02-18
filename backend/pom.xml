@@ -118,14 +118,6 @@
       <plugin>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-maven-plugin</artifactId>
-        <configuration>
-          <excludes>
-            <exclude>
-              <groupId>org.projectlombok</groupId>
-              <artifactId>lombok</artifactId>
-            </exclude>
-          </excludes>
-        </configuration>
       </plugin>
 
       <plugin>
@@ -156,7 +148,7 @@
         <executions>
           <execution>
             <id>generate-backend-openapi</id>
-            <phase>compile</phase>
+            <phase>generate-sources</phase>
             <goals>
               <goal>generate</goal>
             </goals>
@@ -173,6 +165,11 @@
                 <skipDefaultInterface>true</skipDefaultInterface>
                 <dateLibrary>java8</dateLibrary>
                 <openApiNullable>false</openApiNullable>
+                <additionalModelTypeAnnotations>
+                  @lombok.Data
+                  @lombok.AllArgsConstructor
+                  @lombok.NoArgsConstructor
+                </additionalModelTypeAnnotations>
               </configOptions>
               <modelNameSuffix>Dto</modelNameSuffix>
               <generateApiTests>false</generateApiTests>
@@ -184,7 +181,7 @@
           </execution>
           <execution>
             <id>generate-frontend-openapi</id>
-            <phase>compile</phase>
+            <phase>generate-sources</phase>
             <goals>
               <goal>generate</goal>
             </goals>

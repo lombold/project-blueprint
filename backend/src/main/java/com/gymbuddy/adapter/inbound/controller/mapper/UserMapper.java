@@ -1,14 +1,14 @@
 package com.gymbuddy.adapter.inbound.controller.mapper;
 
-import com.gymbuddy.adapter.inbound.controller.dto.UserDTO;
+import com.gymbuddy.adapter.inbound.controller.dto.UserDto;
 import com.gymbuddy.domain.entity.User;
 import org.mapstruct.Mapper;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", uses = {UserIdMapper.class})
 public interface UserMapper {
 
-  UserDTO toDto(User user);
+  UserDto toDto(User user);
 
-  User toDomain(UserDTO userDTO);
+  User toDomain(UserDto UserDto);
 }
 

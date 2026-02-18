@@ -3,7 +3,7 @@ package com.gymbuddy.domain.entity;
 import com.gymbuddy.domain.value.UserId;
 import lombok.*;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,8 +17,8 @@ public class User {
   private UserId id;
   private String username;
   private String email;
-  private LocalDateTime createdAt;
-  private LocalDateTime updatedAt;
+  private OffsetDateTime createdAt;
+  private OffsetDateTime updatedAt;
 
   public void validate() {
     if (username == null || username.isBlank()) {
