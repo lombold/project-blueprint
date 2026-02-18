@@ -19,7 +19,6 @@ public class User {
   private String email;
   private LocalDateTime createdAt;
   private LocalDateTime updatedAt;
-  private List<Workout> workouts = new ArrayList<>();
 
   public void validate() {
     if (username == null || username.isBlank()) {

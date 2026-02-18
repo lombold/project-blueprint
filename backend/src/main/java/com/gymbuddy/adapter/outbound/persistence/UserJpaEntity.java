@@ -34,8 +34,4 @@ public class UserJpaEntity {
 
   @Column(name = "updated_at")
   private LocalDateTime updatedAt;
-
-  @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-  @Builder.Default
-  private List<WorkoutJpaEntity> workouts = new ArrayList<>();
 }

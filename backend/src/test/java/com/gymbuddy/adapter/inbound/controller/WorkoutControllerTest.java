@@ -5,10 +5,6 @@ import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 
-import com.gymbuddy.adapter.inbound.controller.dto.WorkoutDTO;
-import com.gymbuddy.adapter.inbound.controller.mapper.WorkoutMapper;
-import com.gymbuddy.application.service.WorkoutService;
-import com.gymbuddy.domain.entity.Workout;
 import com.gymbuddy.domain.exception.ResourceNotFoundException;
 import java.time.LocalDateTime;
 import java.util.Arrays;

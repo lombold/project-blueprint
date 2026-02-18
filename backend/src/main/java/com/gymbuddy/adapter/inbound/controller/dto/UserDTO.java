@@ -25,6 +25,4 @@ public class UserDTO {
   private String email;
   private LocalDateTime createdAt;
   private LocalDateTime updatedAt;
-  @Builder.Default
-  private List<WorkoutDTO> workouts = new ArrayList<>();
 }
