@@ -55,7 +55,7 @@ RUN mkdir -p BOOT-INF/classes/static/ui && \
 RUN jar cfm gym-buddy.jar META-INF/MANIFEST.MF -C . .
 
 # Stage 4: Runtime image (minimal JRE)
-FROM eclipse-temurin:21-jre-alpine
+FROM eclipse-temurin:25-jre-alpine
 
 WORKDIR /app
 
@@ -64,7 +64,7 @@ COPY --from=app-builder /app/packaging/gym-buddy.jar .
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-    CMD wget --no-verbose --tries=1 --spider http://localhost:8080/api/v1/health || exit 1
+    CMD wget --no-verbose --tries=1 --spider http://localhost:8080/api/health || exit 1
 
 # Expose port
 EXPOSE 8080
