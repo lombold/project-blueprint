@@ -1,16 +1,15 @@
-import { Component, OnInit, signal } from '@angular/core';
-import { CommonModule, NgFor, NgIf } from '@angular/common';
-import { FormsModule } from '@angular/forms';
-import { ApiService } from '../../services/api.service';
-import { User } from '../../models/user.model';
+import { ChangeDetectionStrategy, Component, computed, inject, OnInit, signal } from '@angular/core';
+import { FormField, email, form, required } from '@angular/forms/signals';
+import { UsersService } from '../../core/api';
+import { User } from '../../core/api/model/user';
 
 /**
  * Users page component - Manage user profiles
  */
 @Component({
   selector: 'app-users',
-  standalone: true,
-  imports: [CommonModule, NgFor, NgIf, FormsModule],
+  imports: [FormField],
+  changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="min-h-screen bg-gray-50 p-8">
       <div class="max-w-6xl mx-auto">
@@ -24,76 +23,100 @@ import { User } from '../../models/user.model';
           </button>
         </div>
 
-        <!-- User Form -->
-        <div *ngIf="isFormOpen()" class="bg-white rounded-lg shadow-lg p-6 mb-8">
-          <h2 class="text-2xl font-bold mb-6 text-gray-900">Create New User</h2>
-          <form (ngSubmit)="createUser()">
-            <div class="space-y-4">
-              <input
-                [(ngModel)]="formData.username"
-                name="username"
-                placeholder="Username"
-                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-                required
-              />
-              <input
-                [(ngModel)]="formData.email"
-                name="email"
-                type="email"
-                placeholder="Email"
-                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-                required
-              />
-              <div class="flex gap-4">
+        @if (isFormOpen()) {
+          <div class="bg-white rounded-lg shadow-lg p-6 mb-8">
+            <h2 class="text-2xl font-bold mb-6 text-gray-900">Create New User</h2>
+            <form (submit)="createUser($event)">
+              <div class="space-y-4">
+                <div>
+                  <label class="sr-only" for="username">Username</label>
+                  <input
+                    id="username"
+                    type="text"
+                    [formField]="userForm.username"
+                    placeholder="Username"
+                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                    required
+                  />
+                  @if (userForm.username().touched() && userForm.username().invalid()) {
+                    <p class="text-sm text-red-600 mt-2">{{ userForm.username().errors()[0]?.message }}</p>
+                  }
+                </div>
+                <div>
+                  <label class="sr-only" for="email">Email</label>
+                  <input
+                    id="email"
+                    type="email"
+                    [formField]="userForm.email"
+                    placeholder="Email"
+                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                    required
+                  />
+                  @if (userForm.email().touched() && userForm.email().invalid()) {
+                    <p class="text-sm text-red-600 mt-2">{{ userForm.email().errors()[0]?.message }}</p>
+                  }
+                </div>
+                <div class="flex gap-4">
+                  <button
+                    type="submit"
+                    [disabled]="!canSubmit()"
+                    class="px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors font-semibold disabled:opacity-60 disabled:cursor-not-allowed"
+                  >
+                    Create
+                  </button>
+                  <button
+                    type="button"
+                    (click)="cancelForm()"
+                    class="px-6 py-3 bg-gray-300 text-gray-800 rounded-lg hover:bg-gray-400 transition-colors font-semibold"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            </form>
+          </div>
+        }
+
+        @if (hasUsers()) {
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            @for (user of users(); track user.id ?? user.username) {
+              <div class="bg-white rounded-lg shadow-lg p-6 hover:shadow-xl transition-shadow">
+                <h3 class="text-xl font-bold text-gray-900 mb-2">{{ user.username }}</h3>
+                <p class="text-gray-600 mb-4">{{ user.email }}</p>
                 <button
-                  type="submit"
-                  class="px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors font-semibold"
+                  (click)="deleteUser(user.id)"
+                  class="w-full px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
                 >
-                  Create
-                </button>
-                <button
-                  type="button"
-                  (click)="cancelForm()"
-                  class="px-6 py-3 bg-gray-300 text-gray-800 rounded-lg hover:bg-gray-400 transition-colors font-semibold"
-                >
-                  Cancel
+                  Delete
                 </button>
               </div>
-            </div>
-          </form>
-        </div>
-
-        <!-- Users List -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          <div *ngFor="let user of users()" class="bg-white rounded-lg shadow-lg p-6 hover:shadow-xl transition-shadow">
-            <h3 class="text-xl font-bold text-gray-900 mb-2">{{ user.username }}</h3>
-            <p class="text-gray-600 mb-4">{{ user.email }}</p>
-            <button
-              (click)="deleteUser(user.id)"
-              class="w-full px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
-            >
-              Delete
-            </button>
+            }
           </div>
-        </div>
-
-        <div *ngIf="users().length === 0" class="text-center py-12">
-          <p class="text-gray-600 text-lg">No users yet. Create one to get started!</p>
-        </div>
+        } @else {
+          <div class="text-center py-12">
+            <p class="text-gray-600 text-lg">No users yet. Create one to get started!</p>
+          </div>
+        }
       </div>
     </div>
   `,
   styles: []
 })
 export class UsersPage implements OnInit {
-  users = signal<User[]>([]);
-  isFormOpen = signal(false);
-  formData = {
+  private readonly userService = inject(UsersService);
+  readonly users = signal<User[]>([]);
+  readonly isFormOpen = signal(false);
+  readonly formModel = signal({
     username: '',
     email: ''
-  };
-
-  constructor(private apiService: ApiService) {}
+  });
+  readonly userForm = form(this.formModel, (schema) => {
+    required(schema.username, { message: 'Username is required.' });
+    required(schema.email, { message: 'Email is required.' });
+    email(schema.email, { message: 'Enter a valid email address.' });
+  });
+  readonly canSubmit = computed(() => this.userForm.username().valid() && this.userForm.email().valid());
+  readonly hasUsers = computed(() => this.users().length > 0);
 
   ngOnInit(): void {
     this.loadUsers();
@@ -105,16 +128,21 @@ export class UsersPage implements OnInit {
 
   cancelForm(): void {
     this.isFormOpen.set(false);
-    this.formData = { username: '', email: '' };
+    this.resetForm();
   }
 
-  createUser(): void {
+  createUser(event: SubmitEvent): void {
+    event.preventDefault();
+    if (!this.canSubmit()) {
+      return;
+    }
+
     const newUser: User = {
-      username: this.formData.username,
-      email: this.formData.email
+      username: this.formModel().username,
+      email: this.formModel().email
     };
 
-    this.apiService.createUser(newUser).subscribe({
+    this.userService.createUser(newUser).subscribe({
       next: () => {
         this.loadUsers();
         this.cancelForm();
@@ -123,19 +151,25 @@ export class UsersPage implements OnInit {
     });
   }
 
-  deleteUser(id: any): void {
-    if (id && confirm('Are you sure?')) {
-      this.apiService.deleteUser(id).subscribe({
-        next: () => this.loadUsers(),
-        error: (err) => console.error('Error deleting user:', err)
-      });
+  deleteUser(id: number | undefined): void {
+    if (id === undefined || !confirm('Are you sure?')) {
+      return;
     }
+
+    this.userService.deleteUser(id).subscribe({
+      next: () => this.loadUsers(),
+      error: (err) => console.error('Error deleting user:', err)
+    });
   }
 
   private loadUsers(): void {
-    this.apiService.getUsers().subscribe({
-      next: (users) => this.users.set(users),
-      error: (err) => console.error('Error loading users:', err)
-    });
+    // this.userService.getUsers().subscribe({
+    //   next: (users) => this.users.set(users),
+    //   error: (err) => console.error('Error loading users:', err)
+    // });
+  }
+
+  private resetForm(): void {
+    this.formModel.set({ username: '', email: '' });
   }
 }
