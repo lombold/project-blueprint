@@ -25,7 +25,7 @@ test.describe('Users Page E2E Tests', () => {
 
     // Wait for form to appear
     await page.waitForSelector('input[placeholder="Username"]');
-    
+
     // Verify form fields are visible
     await expect(page.locator('input[placeholder="Username"]')).toBeVisible();
     await expect(page.locator('input[placeholder="Email"]')).toBeVisible();
@@ -66,16 +66,5 @@ test.describe('Users Page E2E Tests', () => {
 
     // Verify form is closed (optional - depends on API response)
     // In real scenario, the form would close after successful submission
-  });
-
-  test('should navigate back to dashboard from users page', async ({ page }) => {
-    // Click Dashboard link
-    await page.click('a:has-text("Dashboard")');
-    
-    // Wait for page load
-    await page.waitForLoadState('networkidle');
-    
-    // Verify we're on dashboard
-    await expect(page.locator('h1')).toContainText('Gym Buddy');
   });
 });

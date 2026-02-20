@@ -38,7 +38,7 @@ FROM maven:3.9-eclipse-temurin-25 AS app-builder
 WORKDIR /app
 
 # Copy the built backend JAR
-COPY --from=backend-builder /app/backend/target/gym-buddy.jar ./backend.jar
+COPY --from=backend-builder /app/backend/target/projectName.jar ./backend.jar
 
 # Copy the built Angular app
 COPY --from=frontend-builder /app/frontend/dist/frontend /app/frontend-dist
@@ -64,7 +64,7 @@ COPY --from=app-builder /app/packaging/gym-buddy.jar .
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-    CMD wget --no-verbose --tries=1 --spider http://localhost:8080/api/health || exit 1
+    CMD wget --no-verbose --tries=1 --spider http://localhost:8080/api/actuator/health || exit 1
 
 # Expose port
 EXPOSE 8080

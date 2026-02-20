@@ -6,7 +6,8 @@
     "start": "ng serve",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
-    "test": "ng test"
+    "test": "ng test",
+    "test:ci": "ng test --coverage"
   },
   "prettier": {
     "printWidth": 100,
@@ -40,6 +41,7 @@
     "@angular/compiler-cli": "^21.0.0",
     "@playwright/test": "^1.58.2",
     "@tailwindcss/postcss": "^4.1.18",
+    "@vitest/coverage-v8": "^4.0.18",
     "autoprefixer": "^10.4.24",
     "eslint": "^10.0.0",
     "jsdom": "^27.1.0",
