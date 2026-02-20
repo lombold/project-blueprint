@@ -3,7 +3,7 @@ package com.gymbuddy.adapter.inbound.controller.mapper;
 import com.gymbuddy.domain.value.UserId;
 import org.mapstruct.Mapper;
 
-@Mapper(componentModel = "spring")
+@Mapper
 public interface UserIdMapper {
 
   default UserId toUserId(final Long value) {
