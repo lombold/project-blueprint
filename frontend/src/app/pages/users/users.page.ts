@@ -1,7 +1,6 @@
 import { ChangeDetectionStrategy, Component, computed, inject, OnInit, signal } from '@angular/core';
-import { FormField, email, form, required } from '@angular/forms/signals';
-import { UsersService } from '../../core/api';
-import { User } from '../../core/api/model/user';
+import {User, UsersService} from '../../core/api';
+import {email, form, FormField, required} from '@angular/forms/signals';
 
 /**
  * Users page component - Manage user profiles
@@ -36,7 +35,6 @@ import { User } from '../../core/api/model/user';
                     [formField]="userForm.username"
                     placeholder="Username"
                     class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-                    required
                   />
                   @if (userForm.username().touched() && userForm.username().invalid()) {
                     <p class="text-sm text-red-600 mt-2">{{ userForm.username().errors()[0]?.message }}</p>
@@ -50,7 +48,6 @@ import { User } from '../../core/api/model/user';
                     [formField]="userForm.email"
                     placeholder="Email"
                     class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-                    required
                   />
                   @if (userForm.email().touched() && userForm.email().invalid()) {
                     <p class="text-sm text-red-600 mt-2">{{ userForm.email().errors()[0]?.message }}</p>
