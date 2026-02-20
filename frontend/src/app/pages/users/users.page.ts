@@ -160,10 +160,10 @@ export class UsersPage implements OnInit {
   }
 
   private loadUsers(): void {
-    // this.userService.getUsers().subscribe({
-    //   next: (users) => this.users.set(users),
-    //   error: (err) => console.error('Error loading users:', err)
-    // });
+    this.userService.listUsers().subscribe({
+      next: (users) => this.users.set(users),
+      error: (err) => console.error('Error loading users:', err)
+    });
   }
 
   private resetForm(): void {
