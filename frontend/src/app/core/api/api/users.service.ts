@@ -37,7 +37,7 @@ export class UsersService extends BaseService {
 
     /**
      * Create a user
-     * @endpoint post /users
+     * @endpoint post /api/users
      * @param user 
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
@@ -85,7 +85,7 @@ export class UsersService extends BaseService {
             }
         }
 
-        let localVarPath = `/users`;
+        let localVarPath = `/api/users`;
         const { basePath, withCredentials } = this.configuration;
         return this.httpClient.request<User>('post', `${basePath}${localVarPath}`,
             {
@@ -103,7 +103,7 @@ export class UsersService extends BaseService {
 
     /**
      * Delete a user
-     * @endpoint delete /users/{id}
+     * @endpoint delete /api/users/{id}
      * @param id 
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
@@ -141,7 +141,7 @@ export class UsersService extends BaseService {
             }
         }
 
-        let localVarPath = `/users/${this.configuration.encodeParam({name: "id", value: id, in: "path", style: "simple", explode: false, dataType: "number", dataFormat: "int64"})}`;
+        let localVarPath = `/api/users/${this.configuration.encodeParam({name: "id", value: id, in: "path", style: "simple", explode: false, dataType: "number", dataFormat: "int64"})}`;
         const { basePath, withCredentials } = this.configuration;
         return this.httpClient.request<any>('delete', `${basePath}${localVarPath}`,
             {
@@ -158,7 +158,7 @@ export class UsersService extends BaseService {
 
     /**
      * Get a user by id
-     * @endpoint get /users/{id}
+     * @endpoint get /api/users/{id}
      * @param id 
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
@@ -197,7 +197,7 @@ export class UsersService extends BaseService {
             }
         }
 
-        let localVarPath = `/users/${this.configuration.encodeParam({name: "id", value: id, in: "path", style: "simple", explode: false, dataType: "number", dataFormat: "int64"})}`;
+        let localVarPath = `/api/users/${this.configuration.encodeParam({name: "id", value: id, in: "path", style: "simple", explode: false, dataType: "number", dataFormat: "int64"})}`;
         const { basePath, withCredentials } = this.configuration;
         return this.httpClient.request<User>('get', `${basePath}${localVarPath}`,
             {
@@ -214,7 +214,7 @@ export class UsersService extends BaseService {
 
     /**
      * List users
-     * @endpoint get /users
+     * @endpoint get /api/users
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      * @param options additional options
@@ -249,7 +249,7 @@ export class UsersService extends BaseService {
             }
         }
 
-        let localVarPath = `/users`;
+        let localVarPath = `/api/users`;
         const { basePath, withCredentials } = this.configuration;
         return this.httpClient.request<Array<User>>('get', `${basePath}${localVarPath}`,
             {
@@ -266,7 +266,7 @@ export class UsersService extends BaseService {
 
     /**
      * Update a user
-     * @endpoint put /users/{id}
+     * @endpoint put /api/users/{id}
      * @param id 
      * @param user 
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
@@ -318,7 +318,7 @@ export class UsersService extends BaseService {
             }
         }
 
-        let localVarPath = `/users/${this.configuration.encodeParam({name: "id", value: id, in: "path", style: "simple", explode: false, dataType: "number", dataFormat: "int64"})}`;
+        let localVarPath = `/api/users/${this.configuration.encodeParam({name: "id", value: id, in: "path", style: "simple", explode: false, dataType: "number", dataFormat: "int64"})}`;
         const { basePath, withCredentials } = this.configuration;
         return this.httpClient.request<User>('put', `${basePath}${localVarPath}`,
             {

@@ -37,7 +37,7 @@ export class HealthService extends BaseService {
 
     /**
      * Health check
-     * @endpoint get /health
+     * @endpoint get /api/health
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      * @param options additional options
@@ -72,7 +72,7 @@ export class HealthService extends BaseService {
             }
         }
 
-        let localVarPath = `/health`;
+        let localVarPath = `/api/health`;
         const { basePath, withCredentials } = this.configuration;
         return this.httpClient.request<HealthStatus>('get', `${basePath}${localVarPath}`,
             {
