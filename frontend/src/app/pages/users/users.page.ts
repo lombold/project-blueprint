@@ -1,4 +1,5 @@
-import { ChangeDetectionStrategy, Component, computed, inject, OnInit, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
+import { rxResource } from '@angular/core/rxjs-interop';
 import {User, UsersService} from '../../core/api';
 import {email, form, FormField, required} from '@angular/forms/signals';
 
@@ -74,7 +75,15 @@ import {email, form, FormField, required} from '@angular/forms/signals';
           </div>
         }
 
-        @if (hasUsers()) {
+        @if (isLoading()) {
+          <div class="text-center py-12" aria-live="polite">
+            <p class="text-gray-600 text-lg">Loading users...</p>
+          </div>
+        } @else if (loadError()) {
+          <div class="text-center py-12" aria-live="polite">
+            <p class="text-red-700 text-lg">Could not load users. Please try again.</p>
+          </div>
+        } @else if (hasUsers()) {
           <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             @for (user of users(); track user.id ?? user.username) {
               <div class="bg-white rounded-lg shadow-lg p-6 hover:shadow-xl transition-shadow">
@@ -99,9 +108,13 @@ import {email, form, FormField, required} from '@angular/forms/signals';
   `,
   styles: []
 })
-export class UsersPage implements OnInit {
+export class UsersPage {
   private readonly userService = inject(UsersService);
-  readonly users = signal<User[]>([]);
+  readonly usersResource = rxResource({
+    defaultValue: [] as User[],
+    stream: () => this.userService.listUsers()
+  });
+  readonly users = computed(() => this.usersResource.hasValue() ? this.usersResource.value() : []);
   readonly isFormOpen = signal(false);
   readonly formModel = signal({
     username: '',
@@ -113,11 +126,9 @@ export class UsersPage implements OnInit {
     email(schema.email, { message: 'Enter a valid email address.' });
   });
   readonly canSubmit = computed(() => this.userForm.username().valid() && this.userForm.email().valid());
+  readonly isLoading = computed(() => this.usersResource.isLoading());
+  readonly loadError = computed(() => this.usersResource.error());
   readonly hasUsers = computed(() => this.users().length > 0);
-
-  ngOnInit(): void {
-    this.loadUsers();
-  }
 
   showForm(): void {
     this.isFormOpen.set(true);
@@ -141,7 +152,7 @@ export class UsersPage implements OnInit {
 
     this.userService.createUser(newUser).subscribe({
       next: () => {
-        this.loadUsers();
+        this.usersResource.reload();
         this.cancelForm();
       },
       error: (err) => console.error('Error creating user:', err)
@@ -154,15 +165,8 @@ export class UsersPage implements OnInit {
     }
 
     this.userService.deleteUser(id).subscribe({
-      next: () => this.loadUsers(),
+      next: () => this.usersResource.reload(),
       error: (err) => console.error('Error deleting user:', err)
-    });
-  }
-
-  private loadUsers(): void {
-    this.userService.listUsers().subscribe({
-      next: (users) => this.users.set(users),
-      error: (err) => console.error('Error loading users:', err)
     });
   }
 
