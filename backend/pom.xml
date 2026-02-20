@@ -176,6 +176,7 @@
                 <openApiNullable>false</openApiNullable>
                 <additionalModelTypeAnnotations>
                   @lombok.Data
+                  @lombok.Builder
                   @lombok.AllArgsConstructor
                   @lombok.NoArgsConstructor
                 </additionalModelTypeAnnotations>

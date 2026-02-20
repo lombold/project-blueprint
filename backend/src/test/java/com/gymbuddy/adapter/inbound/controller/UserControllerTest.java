@@ -41,8 +41,8 @@ class UserControllerTest {
 
   private User user1;
   private User user2;
-  private UserDto UserDto1;
-  private UserDto UserDto2;
+  private UserDto userDto1;
+  private UserDto userDto2;
 
   @BeforeEach
   void setUp() {
@@ -66,16 +66,16 @@ class UserControllerTest {
         .build();
 
     // Setup DTOs
-    UserDto1 = UserDto.builder()
-        .id(UserId.of(1L))
+    userDto1 = UserDto.builder()
+        .id(1L)
         .username("johndoe")
         .email("john@example.com")
         .createdAt(now)
         .updatedAt(now)
         .build();
 
-    UserDto2 = UserDto.builder()
-        .id(UserId.of(2L))
+    userDto2 = UserDto.builder()
+        .id(2L)
         .username("janedoe")
         .email("jane@example.com")
         .createdAt(now)
@@ -88,11 +88,11 @@ class UserControllerTest {
     // Given
     final var users = Arrays.asList(user1, user2);
     when(userService.getAllUsers()).thenReturn(users);
-    when(userMapper.toDto(user1)).thenReturn(UserDto1);
-    when(userMapper.toDto(user2)).thenReturn(UserDto2);
+    when(userMapper.toDto(user1)).thenReturn(userDto1);
+    when(userMapper.toDto(user2)).thenReturn(userDto2);
 
     // When
-    final var response = userController.getAllUsers();
+    final var response = userController.listUsers();
 
     // Then
     assertNotNull(response);
@@ -107,7 +107,7 @@ class UserControllerTest {
   void shouldGetUserById() {
     // Given
     when(userService.getUserById(UserId.of(1L))).thenReturn(user1);
-    when(userMapper.toDto(user1)).thenReturn(UserDto1);
+    when(userMapper.toDto(user1)).thenReturn(userDto1);
 
     // When
     final var response = userController.getUserById(1L);
@@ -116,7 +116,7 @@ class UserControllerTest {
     assertNotNull(response);
     assertEquals(HttpStatus.OK, response.getStatusCode());
     assertNotNull(response.getBody());
-    assertEquals(UserId.of(1L), response.getBody().getId());
+    assertEquals(1L, response.getBody().getId());
     assertEquals("johndoe", response.getBody().getUsername());
     assertEquals("john@example.com", response.getBody().getEmail());
   }
@@ -155,7 +155,7 @@ class UserControllerTest {
         .build();
 
     final var createdDTO = UserDto.builder()
-        .id(UserId.of(3L))
+        .id(3L)
         .username("newuser")
         .email("newuser@example.com")
         .createdAt(createdUser.getCreatedAt())
@@ -173,7 +173,7 @@ class UserControllerTest {
     assertNotNull(response);
     assertEquals(HttpStatus.CREATED, response.getStatusCode());
     assertNotNull(response.getBody());
-    assertEquals(UserId.of(3L), response.getBody().getId());
+    assertEquals(3L, response.getBody().getId());
     assertEquals("newuser", response.getBody().getUsername());
     assertEquals("newuser@example.com", response.getBody().getEmail());
   }
@@ -200,7 +200,7 @@ class UserControllerTest {
         .build();
 
     final var updatedDTO = UserDto.builder()
-        .id(UserId.of(1L))
+        .id(1L)
         .username("updateduser")
         .email("updated@example.com")
         .createdAt(user1.getCreatedAt())
@@ -218,7 +218,7 @@ class UserControllerTest {
     assertNotNull(response);
     assertEquals(HttpStatus.OK, response.getStatusCode());
     assertNotNull(response.getBody());
-    assertEquals(UserId.of(1L), response.getBody().getId());
+    assertEquals(1L, response.getBody().getId());
     assertEquals("updateduser", response.getBody().getUsername());
     assertEquals("updated@example.com", response.getBody().getEmail());
   }
