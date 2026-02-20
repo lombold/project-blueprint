@@ -1,9 +1,9 @@
 name: E2E Tests
 
 on:
-  push:
-    branches: [ main ]
-  pull_request:
+  workflow_run:
+    workflows: [ "Build Docker Image" ]
+    types: [ completed ]
     branches: [ main ]
   workflow_dispatch:
 
@@ -14,9 +14,9 @@ jobs:
     
     services:
       backend:
-        image: ghcr.io/${{ github.repository }}:latest
+        image: ghcr.io/${{ github.repository }}:${{ github.event.workflow_run.head_branch }}-${{ github.event.workflow_run.head_sha }}
         options: >-
-          --health-cmd="wget --no-verbose --tries=1 --spider http://localhost:8080/api/v1/health || exit 1"
+          --health-cmd="wget --no-verbose --tries=1 --spider http://localhost:8080/api/actuator/health || exit 1"
           --health-interval=10s
           --health-timeout=5s
           --health-retries=5
@@ -40,7 +40,7 @@ jobs:
       - name: Wait for backend to be ready
         run: |
           for i in {1..30}; do
-            if curl -f http://localhost:8080/api/v1/health; then
+            if curl -f http://localhost:8080/api/actuator/health; then
               echo "Backend is ready"
               exit 0
             fi
