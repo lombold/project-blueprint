@@ -29,38 +29,20 @@ RUN mvn dependency:resolve
 # Copy backend source code
 COPY backend/ .
 
+# Inject Angular build into Spring Boot static resources before packaging
+RUN mkdir -p src/main/resources/static/ui
+COPY --from=frontend-builder /app/frontend/dist/frontend ./src/main/resources/static/ui
+
 # Build without tests
 RUN mvn clean package -DskipTests
 
-# Stage 3: Combine Angular build with backend resources
-FROM maven:3.9-eclipse-temurin-25 AS app-builder
-
-WORKDIR /app
-
-# Copy the built backend JAR
-COPY --from=backend-builder /app/backend/target/projectName.jar ./backend.jar
-
-# Copy the built Angular app
-COPY --from=frontend-builder /app/frontend/dist/frontend /app/frontend-dist
-
-# Create a new build to package everything together
-WORKDIR /app/packaging
-RUN jar xf ../backend.jar
-
-# Copy Angular build to static resources
-RUN mkdir -p BOOT-INF/classes/static/ui && \
-    cp -r /app/frontend-dist/* BOOT-INF/classes/static/ui/
-
-# Recreate the JAR with Angular assets
-RUN jar cfm gym-buddy.jar META-INF/MANIFEST.MF -C . .
-
-# Stage 4: Runtime image (minimal JRE)
+# Stage 3: Runtime image (minimal JRE)
 FROM eclipse-temurin:25-jre-alpine
 
 WORKDIR /app
 
 # Copy the final JAR from builder
-COPY --from=app-builder /app/packaging/gym-buddy.jar .
+COPY --from=backend-builder /app/backend/target/projectName.jar ./project-name.jar
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
@@ -70,4 +52,4 @@ HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
 EXPOSE 8080
 
 # Start the application
-ENTRYPOINT ["java", "-jar", "gym-buddy.jar"]
+ENTRYPOINT ["java", "-jar", "project-name.jar"]
