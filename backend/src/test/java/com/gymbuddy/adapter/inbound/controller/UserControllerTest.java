@@ -5,7 +5,6 @@ import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 
 import com.gymbuddy.adapter.inbound.controller.dto.UserDto;
-import com.gymbuddy.adapter.inbound.controller.mapper.UserController;
 import com.gymbuddy.adapter.inbound.controller.mapper.UserMapper;
 import com.gymbuddy.application.service.UserService;
 import com.gymbuddy.domain.entity.User;
@@ -38,7 +37,7 @@ class UserControllerTest {
   private UserMapper userMapper;
 
   @InjectMocks
-  private UserController userController;
+  private com.gymbuddy.adapter.inbound.controller.UserController userController;
 
   private User user1;
   private User user2;
