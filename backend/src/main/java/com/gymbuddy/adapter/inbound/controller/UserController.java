@@ -2,7 +2,7 @@ package com.gymbuddy.adapter.inbound.controller;
 
 import com.gymbuddy.adapter.inbound.controller.dto.UserDto;
 import com.gymbuddy.adapter.inbound.controller.mapper.UserMapper;
-import com.gymbuddy.application.service.UserService;
+import com.gymbuddy.application.port.in.UserUseCase;
 import com.gymbuddy.domain.value.UserId;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -19,12 +19,12 @@ import java.util.List;
 @RequiredArgsConstructor
 public class UserController implements UsersApi {
 
-    private final UserService userService;
+    private final UserUseCase userUseCase;
     private final UserMapper userMapper;
 
     @Override
     public ResponseEntity<List<UserDto>> listUsers() {
-        final var users = userService.getAllUsers();
+        final var users = userUseCase.getAllUsers();
         final var userDTOs = users.stream()
                 .map(userMapper::toDto)
                 .toList();
@@ -33,7 +33,7 @@ public class UserController implements UsersApi {
 
     @Override
     public ResponseEntity<UserDto> getUserById(final Long id) {
-        final var user = userService.getUserById(UserId.of(id));
+        final var user = userUseCase.getUserById(UserId.of(id));
         final var userDTO = userMapper.toDto(user);
         return ResponseEntity.ok(userDTO);
     }
@@ -41,7 +41,7 @@ public class UserController implements UsersApi {
     @Override
     public ResponseEntity<UserDto> createUser(final UserDto userDTO) {
         final var user = userMapper.toDomain(userDTO);
-        final var createdUser = userService.createUser(user);
+        final var createdUser = userUseCase.createUser(user);
         final var createdDTO = userMapper.toDto(createdUser);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdDTO);
     }
@@ -49,14 +49,14 @@ public class UserController implements UsersApi {
     @Override
     public ResponseEntity<UserDto> updateUser(final Long id, final UserDto userDTO) {
         final var user = userMapper.toDomain(userDTO);
-        final var updatedUser = userService.updateUser(UserId.of(id), user);
+        final var updatedUser = userUseCase.updateUser(UserId.of(id), user);
         final var updatedDTO = userMapper.toDto(updatedUser);
         return ResponseEntity.ok(updatedDTO);
     }
 
     @Override
     public ResponseEntity<Void> deleteUser(final Long id) {
-        userService.deleteUser(UserId.of(id));
+        userUseCase.deleteUser(UserId.of(id));
         return ResponseEntity.noContent().build();
     }
 }

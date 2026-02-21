@@ -6,7 +6,7 @@ import static org.mockito.Mockito.when;
 
 import com.gymbuddy.adapter.inbound.controller.dto.UserDto;
 import com.gymbuddy.adapter.inbound.controller.mapper.UserMapper;
-import com.gymbuddy.application.service.UserService;
+import com.gymbuddy.application.port.in.UserUseCase;
 import com.gymbuddy.domain.entity.User;
 import com.gymbuddy.domain.exception.ResourceNotFoundException;
 import java.time.OffsetDateTime;
@@ -31,7 +31,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class UserControllerTest {
 
   @Mock
-  private UserService userService;
+  private UserUseCase userUseCase;
 
   @Mock
   private UserMapper userMapper;
@@ -87,7 +87,7 @@ class UserControllerTest {
   void shouldGetAllUsers() {
     // Given
     final var users = Arrays.asList(user1, user2);
-    when(userService.getAllUsers()).thenReturn(users);
+    when(userUseCase.getAllUsers()).thenReturn(users);
     when(userMapper.toDto(user1)).thenReturn(userDto1);
     when(userMapper.toDto(user2)).thenReturn(userDto2);
 
@@ -106,7 +106,7 @@ class UserControllerTest {
   @Test
   void shouldGetUserById() {
     // Given
-    when(userService.getUserById(UserId.of(1L))).thenReturn(user1);
+    when(userUseCase.getUserById(UserId.of(1L))).thenReturn(user1);
     when(userMapper.toDto(user1)).thenReturn(userDto1);
 
     // When
@@ -124,7 +124,7 @@ class UserControllerTest {
   @Test
   void shouldReturn404WhenUserNotFound() {
     // Given
-    when(userService.getUserById(UserId.of(999L)))
+    when(userUseCase.getUserById(UserId.of(999L)))
         .thenThrow(new ResourceNotFoundException("User not found with ID: 999"));
 
     // When & Then
@@ -163,7 +163,7 @@ class UserControllerTest {
         .build();
 
     when(userMapper.toDomain(any(UserDto.class))).thenReturn(createUser);
-    when(userService.createUser(any(User.class))).thenReturn(createdUser);
+    when(userUseCase.createUser(any(User.class))).thenReturn(createdUser);
     when(userMapper.toDto(createdUser)).thenReturn(createdDTO);
 
     // When
@@ -208,7 +208,7 @@ class UserControllerTest {
         .build();
 
     when(userMapper.toDomain(any(UserDto.class))).thenReturn(updateUser);
-    when(userService.updateUser(any(UserId.class), any(User.class))).thenReturn(updatedUser);
+    when(userUseCase.updateUser(any(UserId.class), any(User.class))).thenReturn(updatedUser);
     when(userMapper.toDto(updatedUser)).thenReturn(updatedDTO);
 
     // When
@@ -226,7 +226,7 @@ class UserControllerTest {
   @Test
   void shouldDeleteUser() {
     // Given
-    doNothing().when(userService).deleteUser(UserId.of(1L));
+    doNothing().when(userUseCase).deleteUser(UserId.of(1L));
 
     // When
     final var response = userController.deleteUser(1L);
@@ -239,13 +239,12 @@ class UserControllerTest {
   @Test
   void shouldThrowExceptionWhenDeletingNonExistentUser() {
     // Given
-    when(userService.getUserById(UserId.of(999L)))
+    when(userUseCase.getUserById(UserId.of(999L)))
         .thenThrow(new ResourceNotFoundException("User not found with ID: 999"));
 
     // When & Then
     assertThrows(ResourceNotFoundException.class, () -> {
-      userService.getUserById(UserId.of(999L));
+      userUseCase.getUserById(UserId.of(999L));
     });
   }
 }
-

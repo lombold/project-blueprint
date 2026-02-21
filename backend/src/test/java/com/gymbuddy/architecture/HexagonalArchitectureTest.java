@@ -6,10 +6,14 @@ import com.tngtech.archunit.junit.CacheMode;
 import com.tngtech.archunit.core.importer.ImportOption;
 import com.tngtech.archunit.lang.ArchRule;
 import jakarta.persistence.Entity;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.web.bind.annotation.RestController;
 
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.classes;
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.noClasses;
+import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.noFields;
+import static com.tngtech.archunit.library.dependencies.SlicesRuleDefinition.slices;
 
 @AnalyzeClasses(packages = "com.gymbuddy", importOptions = ImportOption.DoNotIncludeTests.class, cacheMode = CacheMode.PER_CLASS)
 class HexagonalArchitectureTest {
@@ -56,4 +60,48 @@ class HexagonalArchitectureTest {
           .areAnnotatedWith(Entity.class)
           .should()
           .resideInAPackage("..adapter.outbound.persistence..");
+
+  @ArchTest
+  static final ArchRule inbound_adapters_should_not_depend_on_application_services =
+      noClasses()
+          .that()
+          .resideInAPackage("..adapter.inbound..")
+          .should()
+          .dependOnClassesThat()
+          .resideInAPackage("..application.service..");
+
+  @ArchTest
+  static final ArchRule outbound_adapters_should_not_depend_on_inbound_adapters =
+      noClasses()
+          .that()
+          .resideInAPackage("..adapter.outbound..")
+          .should()
+          .dependOnClassesThat()
+          .resideInAPackage("..adapter.inbound..");
+
+  @ArchTest
+  static final ArchRule application_ports_should_be_interfaces =
+      classes()
+          .that()
+          .resideInAPackage("..application.port..")
+          .should()
+          .beInterfaces();
+
+  @ArchTest
+  static final ArchRule jpa_repositories_should_live_in_outbound_persistence_package =
+      classes()
+          .that()
+          .areAssignableTo(JpaRepository.class)
+          .should()
+          .resideInAPackage("..adapter.outbound.persistence..");
+
+  @ArchTest
+  static final ArchRule no_field_injection_with_autowired =
+      noFields()
+          .should()
+          .beAnnotatedWith(Autowired.class);
+
+  @ArchTest
+  static final ArchRule package_slices_should_be_free_of_cycles =
+      slices().matching("com.gymbuddy.(*)..").should().beFreeOfCycles();
 }
