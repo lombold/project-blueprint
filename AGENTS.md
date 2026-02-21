@@ -96,11 +96,18 @@
   1. Run Angular MCP `list_projects` to identify workspaces before modifying Angular code.
   2. Fetch version-specific best practices with `angular-mcp_get_best_practices` (pass workspace path) and follow them.
   3. For conceptual guidance, query `angular-mcp_search_documentation` with version 21.
-- Architecture expectations:
-  - `core/` handles bootstrap, routing, interceptors, global providers ONLY.
-  - `modules/<feature>/pages` orchestrate data flow; `ui` components are dumb and accept inputs (signals preferred) + emit outputs.
-  - `data-access` performs HTTP calls, `state` hosts signal stores/effects, `models` store types, `util` keeps pure helpers.
-  - `shared/` houses cross-feature UI primitives, pipes, directives. Never import `modules/` code from `shared/` or `core/`.
+- Folder structure:
+  - frontend/src/app/core 
+    - frontend/src/app/core/adapters 
+    - frontend/src/app/core/api 
+    - frontend/src/app/core/services 
+  - frontend/src/app/pages 
+    - frontend/src/app/pages/{page-name} 
+  - frontend/src/app/shared 
+    - frontend/src/app/shared/components 
+    - frontend/src/app/shared/directives 
+    - frontend/src/app/shared/pipes 
+    - frontend/src/app/shared/utils
 - Styling: Tailwind CSS v4. Keep themes tokenized in `tailwind.config` and avoid adding global CSS unless unavoidable.
 
 ## 6. Testing & Quality Gates
