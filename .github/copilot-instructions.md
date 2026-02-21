@@ -1,159 +1,151 @@
-# Gym Buddy — Project Agent Guide
+# Gym Buddy — Agent Guide
 
-## 1. Mission & Scope
-- You are working inside `gym-buddy`, a mono-repo with Spring Boot backend and Angular frontend.
-- Always apply TDD (red → green → refactor) and the hexagonal architecture defaults from `/Users/colberry/.config/opencode/AGENTS.md`.
-- Prefer behavior tests, keep domain free of framework dependencies, and respect the page/UI split on the frontend.
+Mono-repo: Spring Boot 4.0 backend (Java 25, hexagonal) + Angular 21 frontend (Bun, signals, Tailwind v4).
 
-## 2. Key Versions (stay current)
-- Java 25 (runtime & compiler target per `backend/pom.xml`)
-- Spring Boot 4.0.x parent (web/data/validation starters)
-- Angular 21.1.x (`frontend/angular.json`, `ng version`)
-- Node.js 22.15.x & Bun 1.1.x (package manager: `packageManager": "bun@1.1.30"`)
-- Tailwind CSS 4.1.x + PostCSS 8.5.x
-- RxJS 7.8.x, TypeScript 5.9.x, Vitest 4.0.x, Playwright 1.58.x
-- Maven 3.9+ (required for Java 25 toolchain)
+## Build / Test / Lint Commands
 
-## 3. Repository Layout & Boundaries
-- `backend/` — Spring Boot hexagonal app: `domain/`, `application/port|service`, `adapter/inbound|outbound, dtos, jpa entities, mappers`, resources, tests.
-- `frontend/` — Angular workspace with strict `core/`, `modules/<feature>/{pages,ui,data-access,state,models,util}`, `shared/` for cross-cutting UI/utilities, e2e, Vitest config, Tailwind config.
-- Root: Dockerfile, docker-compose, Playwright config, CI workflows. Do not move these without updating docs.
-
-## 4. Backend Workflow
-- Tooling: Maven + Java 25. Commands run from `backend/`.
-    - Run app: `mvn spring-boot:run`
-    - Unit/integration tests + ArchUnit: `mvn test`
-- Architecture rules:
-    - Domain ring has zero Spring/Lombok annotations; value objects and invariants live here.
-    - Application ring exposes `*UseCase` inbound ports, orchestrates transactions, depends only on domain.
-    - Adapters implement `*Port` interfaces (`adapter/inbound/controller`, `adapter/outbound/persistence`). Map DTOs explicitly; never return JPA entities outside adapters.
-
-### Backend Architecture (Hexagonal)
-
-#### Domain (`backend/src/main/java/.../domain`)
-- **Purpose:** pure business model + rules.
-- **Contains:**
-    - Aggregates/entities, value objects, domain services, domain events (if used)
-    - Invariants, validation, business rules (fail fast)
-    - Domain exceptions (business meaning)
-- **Rules:**
-    - **No framework dependencies** (no Spring, no JPA, no Lombok).
-    - No IO, no HTTP, no persistence concerns.
-    - No DTOs, no JPA entities.
-    - Only depends on JDK (and small pure libs if already allowed).
-
-#### Application (`backend/src/main/java/.../application`)
-- **Purpose:** orchestrates use-cases; coordinates domain + ports.
-- **Structure:**
-    - `application/port/in/*UseCase` (inbound ports / use-case APIs)
-    - `application/port/out/*Port` (outbound ports for persistence, messaging, clocks, etc.)
-    - `application/service/*Service` (use-case implementations)
-- **Rules:**
-    - Depends on **domain** only (and port interfaces).
-    - No Spring MVC annotations in core use-case code (wiring belongs in adapters).
-    - Transactions are defined/handled here (or via adapter configuration), but business rules stay in domain.
-    - Converts between domain types and port-level models if needed (but keep mapping minimal and explicit).
-
-#### Adapters (`backend/src/main/java/.../adapter`)
-- **Purpose:** connect the outside world to application ports (inbound) and implement outbound ports (outbound).
-- **Inbound adapters (`adapter/inbound/...`)**
-    - **Spring controllers** (`@RestController`) exposing HTTP endpoints
-    - Request/response **DTOs**
-    - **DTO mappers**:
-        - DTO → command/request model for `*UseCase`
-        - result/domain → DTO for HTTP response
-    - **Rules:**
-        - Controllers depend on `application/port/in/*UseCase`, not on services directly.
-        - Never expose domain objects “as-is” over HTTP; always map to DTOs.
-
-- **Outbound adapters (`adapter/outbound/persistence/...`)**
-    - **JPA repositories** (Spring Data interfaces)
-    - **JPA entities** (ORM mapping)
-    - **Entity mappers**:
-        - Domain ↔ JPA entity mapping (MapStruct if helpful)
-    - **Rules:**
-        - Implement `application/port/out/*Port`.
-        - JPA entities and repositories must not leak outside outbound persistence adapter.
-        - Application/domain never reference JPA types.
-
-- **General adapter rules**
-    - All framework annotations live here (Spring, JPA, validation annotations on DTOs/entities).
-    - Mapping is explicit (prefer dedicated mapper classes over ad-hoc conversion in controllers/services).
-    - Adapters may depend on Spring + application + domain; the core must not depend on adapters.
-
-- Persistence:
-    - Default DB: H2 in-memory via `application.yml`. Keep SQL schema/data in `src/main/resources`.
-    - Use MapStruct (1.6.x) for mapping when helpful; configure processors through Maven as already defined.
-
-
-## 5. Frontend Workflow
-- Package manager: Bun. Run commands from `frontend/`.
-    - Dev server: `bun run start` (Angular serve on :4200).
-    - Build: `bun run build` (ng build output to `dist/`).
-    - Unit tests: `bun run test` (Vitest via `ng test`).
-    - E2E: `bun run test:e2e` (Playwright per repo README).
-- Mandatory Angular MCP workflow:
-    1. Run Angular MCP `list_projects` to identify workspaces before modifying Angular code.
-    2. Fetch version-specific best practices with `angular-mcp_get_best_practices` (pass workspace path) and follow them.
-    3. For conceptual guidance, query `angular-mcp_search_documentation` with version 21.
-- Folder structure:
-  - frontend/src/app/core
-    - frontend/src/app/core/adapters
-    - frontend/src/app/core/api
-    - frontend/src/app/core/services
-  - frontend/src/app/pages
-    - frontend/src/app/pages/{page-name}
-  - frontend/src/app/shared
-    - frontend/src/app/shared/components
-    - frontend/src/app/shared/directives
-    - frontend/src/app/shared/pipes
-    - frontend/src/app/shared/utils
-- Styling: Tailwind CSS v4. Keep themes tokenized in `tailwind.config` and avoid adding global CSS unless unavoidable.
-
-## 6. Testing & Quality Gates
-- **Backend**
-    - Unit tests for domain + use-cases (JUnit 5).
-    - Adapter/integration tests (Spring Boot slices as needed).
-    - Architecture tests via ArchUnit (already a dependency).
-- **Frontend**
-    - Vitest component/state tests. Favor signal behavior specs.
-    - Playwright E2E flows: dashboard, user CRUD, workouts, navigation.
-    - Use dependency-cruiser (if configured) to enforce module boundaries.
-- **Global**
-    - Follow TDD cadence; do not write production code without a failing test.
-    - Run linters (`eslint`) and formatters via existing configs before committing.
-    - Ensure CI workflows continue to pass (`.github/workflows/`).
-
-## 7. Definition of Done (DoD)
-- Tests cover the new/changed behavior (unit + integration/E2E as appropriate) and are deterministic.
-- Hexagonal constraints hold: no forbidden imports between domain/application/adapters.
-- Frontend respects core/modules/shared rules, uses signals-first data flow, and keeps UI components presentational.
-- Tailwind utilities or shared tokens cover styling; avoid ad-hoc CSS.
-- Lint, unit tests, and relevant Playwright specs are green locally.
-- Documentation (README, this agents file) updated when behavior, commands, or architecture decisions change.
-- No secrets or env values are committed; git status clean aside from intended changes.
-
-## 8. Collaboration Checklist
-- Branch naming: `feature/<summary>` or `fix/<summary>`.
-- Write meaningful commit messages describing **why** the change exists.
-- When touching both backend and frontend, keep commits grouped per logical change; mention cross-cutting impacts in PR description.
-- Communicate architectural deviations early; propose new ports/adapters before implementation when possible.
-- If introducing new tooling/dependencies, add to this file under Key Versions.
-
-## 9. Quick Reference Commands
+### Backend (run from `backend/`)
 ```
-# Backend
-cd backend
-mvn spring-boot:run
-mvn test
-
-# Frontend
-cd frontend
-bun install       # first-time setup
-bun run start
-bun run build
-bun run test
-bun run test:e2e
+mvn spring-boot:run                          # start on :8080
+mvn test                                     # all tests (unit + ArchUnit)
+mvn test -Dtest=UserControllerTest           # single test class
+mvn test -Dtest=UserControllerTest#shouldGetAllUsers  # single test method
+mvn clean verify                             # full build + test (CI)
 ```
 
-Keep this `agents.md` current; future contributors rely on it as the single source for repo-specific expectations.
+### Frontend (run from `frontend/`, package manager: Bun)
+```
+bun install                                  # install deps
+bun run start                                # dev server on :4200 (proxies /api to :8080)
+bun run build                                # production build to dist/
+bun run test -- --watch=false                # Vitest unit tests
+bun run test -- --watch=false --include **/users.page.spec.ts  # exact file
+bun run test:ci                              # tests with V8 coverage
+bun run lint                                 # lint
+bun run depcruise                            # boundary checks
+bun run e2e                                  # Playwright E2E (Chromium)
+```
+
+### Docker
+```
+docker-compose up -d backend                 # containerized backend
+docker-compose up                            # full stack
+```
+
+## Architecture — Hexagonal (Backend)
+
+Base package: `com.gymbuddy`. Three rings with strict dependency rules enforced by ArchUnit:
+
+| Ring | Package | May depend on | Must NOT depend on |
+|---|---|---|---|
+| Domain | `domain/{entity,value,exception}` | JDK only (+ Lombok currently) | application, adapter, Spring, JPA |
+| Application | `application/{port/in,port/out,service}` | domain | adapter |
+| Adapters | `adapter/{inbound,outbound,config}` | application, domain, Spring | — |
+
+### Naming conventions
+- Inbound ports: `*UseCase` (interfaces in `application/port/in/`)
+- Outbound ports: `*Port` (interfaces in `application/port/` or `application/port/out/`)
+- Services: `*Service` in `application/service/`, annotated `@Service @RequiredArgsConstructor`
+- Controllers: `*Controller` in `adapter/inbound/controller/`, implements OpenAPI-generated `*Api`
+- DTOs: generated by OpenAPI plugin into `adapter/inbound/controller/dto/`, suffixed `Dto`
+- JPA entities: `*JpaEntity` in `adapter/outbound/persistence/`
+- JPA repos: `*JpaRepository` extends `JpaRepository<>`
+- Persistence adapters: `*RepositoryAdapter` implements `*Port`
+- Mappers: `*Mapper` (MapStruct interfaces, `@Mapper` annotation)
+  - Inbound: `adapter/inbound/controller/mapper/` (domain <-> DTO)
+  - Outbound: `adapter/outbound/persistence/mapper/` (domain <-> JPA entity)
+
+### Key rules
+- Controllers are thin: validate -> map -> call use-case -> map response. Depend on `*UseCase`, never `*Service` directly.
+- Never expose domain objects over HTTP; always map to DTOs.
+- JPA entities never leak outside outbound persistence adapter.
+- Value objects (e.g., `UserId`) use private constructor + static `of()` factory, manual `equals`/`hashCode`/`toString`.
+- Domain exceptions: `DomainException`, `ResourceNotFoundException` (both extend `RuntimeException`).
+- Global error handling: `GlobalExceptionHandler` (`@ControllerAdvice`) maps exceptions to HTTP status codes.
+- DB: H2 in-memory. Schema in `schema.sql`, seed data in `data.sql`.
+- OpenAPI: single `openapi.yml` generates both backend interfaces/DTOs and frontend API client.
+
+## Architecture — Frontend
+
+### Folder structure
+```
+frontend/src/app/
+  core/                    # bootstrap, global infra
+    api/                   # OpenAPI-generated client (DO NOT edit — regenerated by Maven)
+    adapters/              # manual adapters wrapping core/api if needed
+    services/              # global services
+  pages/                   # route-level page components
+    {feature}/             # e.g. pages/users/
+      {feature}.page.ts
+      {feature}.page.spec.ts
+  shared/                  # cross-cutting reusables
+    components/
+    directives/
+    pipes/
+    utils/
+```
+
+### Import rules (enforced by dependency-cruiser)
+- `core/` must NOT import from `pages/`
+- `shared/` must NOT import from `core/` or `pages/`
+- `pages/` features must NOT cross-import each other
+- Outside `core/api/`, import only through the barrel `core/api/index.ts`
+- No circular dependencies
+
+### Angular conventions
+- **Standalone components only** (no NgModules). Components use `imports: [...]` directly.
+- **OnPush change detection** is the default (configured in `angular.json` schematics).
+- **Signals-first**: use `signal()`, `computed()`, `effect()`. RxJS only when signals are insufficient.
+- `rxResource` for async data fetching (from `@angular/core/rxjs-interop`).
+- Signal-based forms: `form()`, `required()`, `email()` from `@angular/forms/signals`.
+- **Inline templates and styles** by default (per `angular.json` schematics). Templates may use `templateUrl` when large.
+- Component selector prefix: `app-` (kebab-case). Directive prefix: `app` (camelCase).
+- Page components: class named `*Page`, selector `app-{feature}`, file `{feature}.page.ts`.
+- Protect component internals with `protected` or `readonly` where appropriate.
+
+## Code Style
+
+### Java
+- **Formatting**: 2-space indent (IDE config). Opening brace on same line. Blank line between methods.
+- **Local variables**: prefer `final var` for type inference (`final var users = ...`).
+- **Method params**: mark `final` (`public ResponseEntity<UserDto> getUserById(final Long id)`).
+- **Imports**: explicit imports, no wildcards. Order: project imports, then `java.*`, then third-party.
+- **Annotations**: Lombok `@Getter @Setter @Builder @RequiredArgsConstructor @AllArgsConstructor @NoArgsConstructor` on adapter/application classes. Domain should avoid Lombok (current code uses it — follow existing pattern until refactored).
+- **No `@Autowired` field injection** (enforced by ArchUnit). Use constructor injection via `@RequiredArgsConstructor`.
+- **Javadoc**: on public classes and port interfaces. Test classes get a one-line class-level doc.
+- **Tests**: JUnit 5 + Mockito. `@ExtendWith(MockitoExtension.class)`, `@Mock`, `@InjectMocks`. Sections: `// Given`, `// When`, `// Then`. Method names: `should{Expected}` or `should{Expected}When{Condition}`.
+
+### TypeScript / Angular
+- **Formatting**: Prettier — 100 char line width, single quotes, 2-space indent, trailing newline.
+- **HTML**: parsed with `angular` parser by Prettier.
+- **Strict TypeScript**: `strict: true`, `noImplicitReturns`, `noFallthroughCasesInSwitch`, `noPropertyAccessFromIndexSignature`.
+- **Imports**: named imports from specific modules. Use barrel `index.ts` exports for `core/api`.
+- **Vitest globals**: `describe`, `it`, `expect`, `vi` are globally available (no import needed).
+- **Test structure**: `describe('ComponentName', () => { it('does X', async () => { ... }) })`.
+- **Test setup**: `TestBed.configureTestingModule({ imports: [Component], providers: [...mocks] })`. Mock services with `vi.fn()`.
+- **Tailwind CSS v4**: utility-first, no custom CSS unless unavoidable. No separate `tailwind.config` file (v4 PostCSS plugin).
+- **SCSS**: style language is `scss` (per `angular.json`), but prefer Tailwind utilities over custom SCSS.
+
+## Error Handling
+
+### Backend
+- Domain validation: throw `IllegalArgumentException` with descriptive message.
+- Resource not found: throw `ResourceNotFoundException` (domain exception).
+- Business rule violations: throw `DomainException`.
+- `GlobalExceptionHandler` maps: `ResourceNotFoundException` -> 404, `DomainException` -> 400, `IllegalArgumentException` -> 400, unhandled `Exception` -> 500 (generic message, no stack leak).
+
+### Frontend
+- `rxResource` exposes `.error()` signal — use `computed()` to derive error state.
+- HTTP errors in manual subscribes: `subscribe({ error: (err) => console.error(...) })`.
+- Template: `@if (loadError())` blocks for user-facing error messages.
+
+## CI (`.github/workflows/`)
+- **test.yml**: push/PR to `main`. Backend: Java 25, `mvn clean verify`. Frontend: `bun run test:ci`, `bun run lint`.
+- **docker.yml**: after test passes on `main`. Multi-stage Docker build, pushes to GHCR.
+- **e2e.yml**: after Docker build. Playwright against containerized app.
+
+## Git Conventions
+- Branches: `feature/<summary>` or `fix/<summary>`
+- Commits: describe **why**, not what. Group backend + frontend changes per logical unit.
+- Never commit secrets or `.env` files.
+- TDD cadence: red -> green -> refactor. No production code without a failing test.
