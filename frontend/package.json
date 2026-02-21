@@ -7,7 +7,8 @@
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
-    "test:ci": "ng test --coverage"
+    "test:ci": "ng test --coverage",
+    "depcruise": "dependency-cruise --config .dependency-cruiser.cjs src/app"
   },
   "prettier": {
     "printWidth": 100,
@@ -43,6 +44,7 @@
     "@tailwindcss/postcss": "^4.1.18",
     "@vitest/coverage-v8": "^4.0.18",
     "autoprefixer": "^10.4.24",
+    "dependency-cruiser": "^16.10.4",
     "eslint": "^10.0.0",
     "jsdom": "^27.1.0",
     "postcss": "^8.5.6",

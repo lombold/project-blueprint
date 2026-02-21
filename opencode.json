@@ -1,0 +1,38 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "mcp": {
+    "angular-mcp": {
+      "type": "local",
+      "enabled": true,
+      "command": [
+        "npx",
+        "-y",
+        "@angular/cli",
+        "mcp"
+      ]
+    },
+    "ast-grep": {
+      "type": "local",
+      "command": [
+        "docker",
+        "run",
+        "--name",
+        "ast-grep-gym-buddy",
+        "-i",
+        "--rm",
+        "-v",
+        ".:/src",
+        "mcp/ast-grep"
+      ]
+    },
+    "playwright-mcp": {
+      "type": "local",
+      "enabled": true,
+      "command": [
+        "npx",
+        "-y",
+        "@playwright/mcp@latest"
+      ]
+    }
+  }
+}
