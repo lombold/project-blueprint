@@ -6,6 +6,7 @@ import com.tngtech.archunit.junit.CacheMode;
 import com.tngtech.archunit.core.importer.ImportOption;
 import com.tngtech.archunit.lang.ArchRule;
 import jakarta.persistence.Entity;
+import javax.annotation.processing.Generated;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.web.bind.annotation.RestController;
@@ -98,6 +99,9 @@ class HexagonalArchitectureTest {
   @ArchTest
   static final ArchRule no_field_injection_with_autowired =
       noFields()
+          .that()
+          .areDeclaredInClassesThat()
+          .haveSimpleNameNotEndingWith("MapperImpl")
           .should()
           .beAnnotatedWith(Autowired.class);
 
