@@ -1,6 +1,6 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="Application" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot">
-    <module name="gym-buddy" />
+    <module name="project-blueprint" />
     <option name="SPRING_BOOT_MAIN_CLASS" value="com.gymbuddy.GymBuddyApplication" />
     <method v="2">
       <option name="Make" enabled="true" />
