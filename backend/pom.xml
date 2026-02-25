@@ -5,8 +5,8 @@
          http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <groupId>com.gymbuddy</groupId>
-  <artifactId>gym-buddy</artifactId>
+  <groupId>com.lombold</groupId>
+  <artifactId>project-blueprint</artifactId>
   <version>1.0.0</version>
   <packaging>jar</packaging>
 
