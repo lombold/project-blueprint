@@ -1,6 +1,6 @@
 spring:
   application:
-    name: gym-buddy
+    name: project-blueprint
   jpa:
     hibernate:
       ddl-auto: create-drop
