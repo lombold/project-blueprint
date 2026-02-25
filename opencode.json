@@ -17,7 +17,7 @@
         "docker",
         "run",
         "--name",
-        "ast-grep-gym-buddy",
+        "ast-grep-project-blueprint",
         "-i",
         "--rm",
         "-v",
