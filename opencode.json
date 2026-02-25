@@ -17,7 +17,7 @@
         "docker",
         "run",
         "--name",
-        "ast-grep-project-blueprint",
+        "ast-grep-project-name",
         "-i",
         "--rm",
         "-v",

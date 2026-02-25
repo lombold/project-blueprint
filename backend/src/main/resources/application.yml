@@ -1,6 +1,6 @@
 spring:
   application:
-    name: project-blueprint
+    name: project-name
   jpa:
     hibernate:
       ddl-auto: create-drop
@@ -22,7 +22,7 @@ spring:
 logging:
   level:
     root: INFO
-    com.gymbuddy: DEBUG
+    com.projectname: DEBUG
     org.springframework.web: DEBUG
     org.springframework.boot.web.servlet.error: DEBUG
 

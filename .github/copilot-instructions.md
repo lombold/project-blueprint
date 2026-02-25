@@ -1,4 +1,4 @@
-# Gym Buddy — Agent Guide
+# ProjectName — Agent Guide
 
 Mono-repo: Spring Boot 4.0 backend (Java 25, hexagonal) + Angular 21 frontend (Bun, signals, Tailwind v4).
 
@@ -34,7 +34,7 @@ docker-compose up                            # full stack
 
 ## Architecture — Hexagonal (Backend)
 
-Base package: `com.gymbuddy`. Three rings with strict dependency rules enforced by ArchUnit:
+Base package: `com.projectname`. Three rings with strict dependency rules enforced by ArchUnit:
 
 | Ring | Package | May depend on | Must NOT depend on |
 |---|---|---|---|

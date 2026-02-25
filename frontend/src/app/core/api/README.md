@@ -1,6 +1,6 @@
 # @
 
-API-first specification for the Gym Buddy application.
+API-first specification for the ProjectName application.
 
 The version of the OpenAPI document: 1.0.0
 

@@ -6,12 +6,12 @@
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>com.lombold</groupId>
-  <artifactId>project-blueprint</artifactId>
+  <artifactId>project-name</artifactId>
   <version>1.0.0</version>
   <packaging>jar</packaging>
 
-  <name>gym-buddy</name>
-  <description>Gym Buddy - Fitness Tracking Application</description>
+  <name>project-name</name>
+  <description>ProjectName - Fitness Tracking Application</description>
 
   <parent>
     <groupId>org.springframework.boot</groupId>
@@ -165,8 +165,8 @@
               <inputSpec>${project.basedir}/src/main/resources/openapi.yml</inputSpec>
               <generatorName>spring</generatorName>
               <output>${project.build.directory}/generated-sources/openapi</output>
-              <apiPackage>com.gymbuddy.adapter.inbound.controller</apiPackage>
-              <modelPackage>com.gymbuddy.adapter.inbound.controller.dto</modelPackage>
+              <apiPackage>com.projectname.adapter.inbound.controller</apiPackage>
+              <modelPackage>com.projectname.adapter.inbound.controller.dto</modelPackage>
               <configOptions>
                 <interfaceOnly>true</interfaceOnly>
                 <useTags>true</useTags>

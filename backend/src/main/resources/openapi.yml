@@ -1,8 +1,8 @@
 openapi: 3.0.3
 info:
-  title: Gym Buddy API
+  title: ProjectName API
   version: 1.0.0
-  description: API-first specification for the Gym Buddy application.
+  description: API-first specification for the ProjectNameapplication.
 servers:
   - url: /
 paths:

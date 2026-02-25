@@ -1,5 +1,5 @@
 /**
- * Gym Buddy API
+ * ProjectName API
  *
  * 
  *
