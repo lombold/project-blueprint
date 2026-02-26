@@ -80,6 +80,9 @@ jobs:
           BLUEPRINT_REPO: ${{ vars.BLUEPRINT_REPO || 'lombold/project-blueprint' }}
           CONFLICT_FILES: ${{ steps.rebase.outputs.conflict_files }}
         run: |
+          # Ensure the label exists (no-op if it already does)
+          gh label create "blueprint-sync" --description "Automated blueprint sync" --color "D93F0B" 2>/dev/null || true
+
           EXISTING=$(gh issue list --label "blueprint-sync" --state open --json number --jq '.[0].number // empty')
 
           BODY=$(cat <<ISSUE_EOF
