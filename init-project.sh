@@ -130,7 +130,7 @@ if [[ -d "$TARGET_DIR" ]]; then
   die "Target directory already exists: $TARGET_DIR"
 fi
 
-git clone "https://github.com/${BLUEPRINT_REPO}.git" "$TARGET_DIR"
+git clone "git@github.com:${BLUEPRINT_REPO}.git" "$TARGET_DIR"
 cd "$TARGET_DIR"
 
 success "Cloned to $TARGET_DIR"
@@ -270,7 +270,7 @@ fi
 
 info "Updating git remote..."
 
-git remote set-url origin "https://github.com/${GITHUB_OWNER}/${NEW_KEBAB}.git"
+git remote set-url origin "git@github.com:${GITHUB_OWNER}/${NEW_KEBAB}.git"
 
 success "Remote set to ${GITHUB_OWNER}/${NEW_KEBAB}"
 
