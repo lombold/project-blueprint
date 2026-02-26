@@ -1,0 +1,170 @@
+name: Sync Blueprint
+
+on:
+  schedule:
+    - cron: '0 6 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    name: Sync with Blueprint
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Configure git identity
+        run: |
+          git config user.name "cln-updater"
+          git config user.email "info@cln.dev"
+
+      - name: Add blueprint remote
+        env:
+          BLUEPRINT_REPO: ${{ vars.BLUEPRINT_REPO || 'lombold/project-blueprint' }}
+        run: git remote add blueprint "https://github.com/${BLUEPRINT_REPO}.git"
+
+      - name: Fetch blueprint
+        run: git fetch blueprint main
+
+      - name: Check for new blueprint commits
+        id: check
+        run: |
+          MERGE_BASE=$(git merge-base HEAD blueprint/main 2>/dev/null || echo "")
+
+          if [ -z "$MERGE_BASE" ]; then
+            echo "No common ancestor found — repositories have diverged completely."
+            echo "has_updates=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          NEW_COMMITS=$(git rev-list "${MERGE_BASE}..blueprint/main" --count)
+          echo "New blueprint commits since merge-base: ${NEW_COMMITS}"
+
+          if [ "$NEW_COMMITS" -eq 0 ]; then
+            echo "Already up to date with blueprint."
+            echo "has_updates=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "has_updates=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Rebase onto blueprint
+        id: rebase
+        if: steps.check.outputs.has_updates == 'true'
+        run: |
+          git checkout -B chore/sync-blueprint main
+
+          if git rebase blueprint/main; then
+            echo "rebase_ok=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "rebase_ok=false" >> "$GITHUB_OUTPUT"
+            CONFLICT_FILES=$(git diff --name-only --diff-filter=U 2>/dev/null || echo "unknown")
+            echo "conflict_files<<EOF" >> "$GITHUB_OUTPUT"
+            echo "$CONFLICT_FILES" >> "$GITHUB_OUTPUT"
+            echo "EOF" >> "$GITHUB_OUTPUT"
+            git rebase --abort
+          fi
+
+      - name: Open issue on conflict
+        if: steps.rebase.outputs.rebase_ok == 'false'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          BLUEPRINT_REPO: ${{ vars.BLUEPRINT_REPO || 'lombold/project-blueprint' }}
+          CONFLICT_FILES: ${{ steps.rebase.outputs.conflict_files }}
+        run: |
+          EXISTING=$(gh issue list --label "blueprint-sync" --state open --json number --jq '.[0].number // empty')
+
+          BODY=$(cat <<ISSUE_EOF
+          ## Blueprint sync failed — manual resolution required
+
+          The automatic rebase of \`main\` onto the latest blueprint (\`${BLUEPRINT_REPO}\`) failed due to conflicts.
+
+          ### Conflicting files
+
+          \`\`\`
+          ${CONFLICT_FILES}
+          \`\`\`
+
+          ### How to resolve
+
+          \`\`\`bash
+          git remote add blueprint https://github.com/${BLUEPRINT_REPO}.git
+          git fetch blueprint main
+          git checkout -b chore/sync-blueprint main
+          git rebase blueprint/main
+          # resolve conflicts, then:
+          git rebase --continue
+          git push --force-with-lease origin chore/sync-blueprint
+          # open a PR from chore/sync-blueprint -> main
+          \`\`\`
+          ISSUE_EOF
+          )
+          # Strip leading whitespace from heredoc lines (YAML block scalar indentation)
+          BODY=$(echo "$BODY" | sed 's/^          //')
+
+          if [ -n "$EXISTING" ]; then
+            gh issue comment "$EXISTING" --body "$BODY"
+            echo "Updated existing issue #${EXISTING}"
+          else
+            gh issue create \
+              --title "Blueprint sync failed: rebase conflicts" \
+              --label "blueprint-sync" \
+              --body "$BODY"
+            echo "Created new issue"
+          fi
+
+          exit 1
+
+      - name: Push sync branch
+        if: steps.rebase.outputs.rebase_ok == 'true'
+        run: git push --force-with-lease origin chore/sync-blueprint
+
+      - name: Create or update pull request
+        if: steps.rebase.outputs.rebase_ok == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          BLUEPRINT_REPO: ${{ vars.BLUEPRINT_REPO || 'lombold/project-blueprint' }}
+        run: |
+          MERGE_BASE=$(git merge-base main blueprint/main)
+          NEW_COMMITS=$(git log --oneline "${MERGE_BASE}..blueprint/main")
+
+          EXISTING_PR=$(gh pr list --head chore/sync-blueprint --state open --json number --jq '.[0].number // empty')
+
+          PR_BODY=$(cat <<EOF
+          ## Sync with blueprint
+
+          This PR rebases \`main\` onto the latest changes from the blueprint repository
+          [\`${BLUEPRINT_REPO}\`](https://github.com/${BLUEPRINT_REPO}).
+
+          ### New blueprint commits
+
+          \`\`\`
+          ${NEW_COMMITS}
+          \`\`\`
+
+          > **Review carefully** — blueprint changes may conflict with project-specific customizations.
+          > This branch is managed automatically. Manual commits on it will be overwritten on the next sync.
+          EOF
+          )
+          # Strip leading whitespace from heredoc lines (YAML block scalar indentation)
+          PR_BODY=$(echo "$PR_BODY" | sed 's/^          //')
+
+          if [ -n "$EXISTING_PR" ]; then
+            gh pr edit "$EXISTING_PR" --body "$PR_BODY"
+            echo "Updated existing PR #${EXISTING_PR}"
+          else
+            gh pr create \
+              --title "chore: sync with blueprint" \
+              --body "$PR_BODY" \
+              --base main \
+              --head chore/sync-blueprint
+            echo "Created new PR"
+          fi
