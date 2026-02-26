@@ -1,12 +1,14 @@
 package com.projectname;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class ProjectNameApplication {
-
-  public static void main(String[] args) {
-    SpringApplication.run(ProjectNameApplication.class, args);
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
+public class ProjectBlueprintApplication {
+  static void main(final String[] args) {
+    SpringApplication.run(ProjectBlueprintApplication.class, args);
   }
 }

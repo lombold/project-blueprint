@@ -1,4 +1,5 @@
 import { defineConfig } from 'vitest/config';
+// @ts-expect-error Cannot find module
 import angular from '@angular/build/testing';
 
 export default defineConfig({
