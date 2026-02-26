@@ -57,7 +57,7 @@
 │   └── e2e.yml                       # E2E tests
 │
 ├── Dockerfile                        # Multi-stage build
-├── .dockerignore
+├── .dockerignore                     # Ignored files for docker build
 ├── docker-compose.yml                # Local dev setup (optional)
 └── README.md
 ```
