@@ -14,7 +14,7 @@ jobs:
 
     services:
       backend:
-        image: ghcr.io/${{ github.repository }}:${{ github.event.workflow_run.head_branch }}-${{ github.event.workflow_run.head_sha }}
+        image: ghcr.io/${{ github.repository }}:${{ github.event.workflow_run.head_branch }}
         options: >-
           --health-cmd="wget --no-verbose --tries=1 --spider http://localhost:8080/actuator/health || exit 1"
           --health-interval=10s

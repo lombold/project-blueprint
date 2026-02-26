@@ -9,7 +9,7 @@ on:
 jobs:
   test-backend:
     runs-on: ubuntu-latest
-    name: Test Backend (Java 25, Maven)
+    name: Test Backend (Java, Maven)
     
     steps:
       - uses: actions/checkout@v4
@@ -34,7 +34,7 @@ jobs:
 
   test-frontend:
     runs-on: ubuntu-latest
-    name: Test Frontend (Angular 19, Vitest)
+    name: Test Frontend (Angular, Vitest)
     
     steps:
       - uses: actions/checkout@v4
