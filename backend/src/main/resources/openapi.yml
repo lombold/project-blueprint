@@ -2,7 +2,7 @@ openapi: 3.0.3
 info:
   title: ProjectName API
   version: 1.0.0
-  description: API-first specification for the ProjectNameapplication.
+  description: API-first specification for the ProjectName application.
 servers:
   - url: /
 paths:

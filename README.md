@@ -75,3 +75,27 @@ Frontend (run from `frontend/`):
 - test: `bun run test`
 - lint: `bunx eslint .`
 - e2e: `bunx playwright test`
+
+## Creating a New Project from This Blueprint
+
+Instead of GitHub's "Use this template" (which strips git history), use the init script to clone with full history and rename everything in one step:
+
+```bash
+./init-project.sh <kebab-case-name> <github-owner> [target-dir]
+
+# Example:
+./init-project.sh my-cool-app lombold
+```
+
+The script derives all case variants from the kebab-case name (`myCoolApp`, `MyCoolApp`, `mycoolapp`, `my-cool-app`), replaces them across all files, renames directories and files (including the Java package), creates a private GitHub repo, and pushes.
+
+Prerequisites: `git`, `gh` (authenticated).
+
+## Blueprint Sync
+
+Projects created from this blueprint include a daily GitHub Actions workflow (`sync-blueprint.yml`) that checks for new blueprint commits, rebases onto them, and opens a PR. If conflicts occur, it opens an issue with resolution instructions instead.
+
+To override the default blueprint source, set a repository variable:
+```bash
+gh variable set BLUEPRINT_REPO --body 'lombold/project-blueprint' --repo <owner>/<repo>
+```
