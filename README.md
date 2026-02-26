@@ -23,7 +23,7 @@
 │   │   │   ├── inbound/controller/   # REST controllers, DTOs, etc.
 │   │   │   ├── outbound/persistence/ # JPA repositories
 │   │   │   └── config/               # Spring config
-│   │   └── {{projectName}}Application.java
+│   │   └── {{ProjectName}}Application.java
 │   ├── src/main/resources/
 │   │   ├── application.yml           # Spring configuration
 │   │   ├── schema.sql                # H2 schema
