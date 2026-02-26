@@ -1,6 +1,5 @@
 import { defineConfig } from 'vitest/config';
 import angular from '@angular/build/testing';
-import { buildAngularTestingEnvironment } from '@angular/build/testing';
 
 export default defineConfig({
   plugins: [angular()],
@@ -19,7 +18,9 @@ export default defineConfig({
   },
   resolve: {
     alias: {
-      '@': '/src'
+      '@core': '/src/app/core',
+      '@pages': '/src/app/pages',
+      '@shared': '/src/app/shared'
     }
   }
 });

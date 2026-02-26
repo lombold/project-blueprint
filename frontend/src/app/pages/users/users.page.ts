@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { rxResource } from '@angular/core/rxjs-interop';
-import {User, UsersService} from '../../core/api';
+import {User, UsersService} from '@core/api';
 import {email, form, FormField, required} from '@angular/forms/signals';
 
 /**

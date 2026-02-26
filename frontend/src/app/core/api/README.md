@@ -1,6 +1,6 @@
 # @
 
-API-first specification for the ProjectName application.
+API-first specification for the ProjectNameapplication.
 
 The version of the OpenAPI document: 1.0.0
 

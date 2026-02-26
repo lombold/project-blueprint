@@ -1,6 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 import { of, Subject, throwError } from 'rxjs';
-import { UsersService, type User } from '../../core/api';
+import { UsersService, type User } from '@core/api';
 import { UsersPage } from './users.page';
 
 describe('UsersPage', () => {
