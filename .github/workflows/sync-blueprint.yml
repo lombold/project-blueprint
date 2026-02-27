@@ -56,29 +56,29 @@ jobs:
             echo "has_updates=true" >> "$GITHUB_OUTPUT"
           fi
 
-      - name: Rebase onto blueprint
-        id: rebase
+      - name: Merge blueprint
+        id: merge
         if: steps.check.outputs.has_updates == 'true'
         run: |
           git checkout -B chore/sync-blueprint main
 
-          if git rebase blueprint/main; then
-            echo "rebase_ok=true" >> "$GITHUB_OUTPUT"
+          if git merge blueprint/main --no-edit; then
+            echo "merge_ok=true" >> "$GITHUB_OUTPUT"
           else
-            echo "rebase_ok=false" >> "$GITHUB_OUTPUT"
+            echo "merge_ok=false" >> "$GITHUB_OUTPUT"
             CONFLICT_FILES=$(git diff --name-only --diff-filter=U 2>/dev/null || echo "unknown")
             echo "conflict_files<<EOF" >> "$GITHUB_OUTPUT"
             echo "$CONFLICT_FILES" >> "$GITHUB_OUTPUT"
             echo "EOF" >> "$GITHUB_OUTPUT"
-            git rebase --abort
+            git merge --abort
           fi
 
       - name: Open issue on conflict
-        if: steps.rebase.outputs.rebase_ok == 'false'
+        if: steps.merge.outputs.merge_ok == 'false'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           BLUEPRINT_REPO: ${{ vars.BLUEPRINT_REPO || 'lombold/project-blueprint' }}
-          CONFLICT_FILES: ${{ steps.rebase.outputs.conflict_files }}
+          CONFLICT_FILES: ${{ steps.merge.outputs.conflict_files }}
         run: |
           # Ensure the label exists (no-op if it already does)
           gh label create "blueprint-sync" --description "Automated blueprint sync" --color "D93F0B" 2>/dev/null || true
@@ -88,7 +88,7 @@ jobs:
           BODY=$(cat <<ISSUE_EOF
           ## Blueprint sync failed — manual resolution required
 
-          The automatic rebase of \`main\` onto the latest blueprint (\`${BLUEPRINT_REPO}\`) failed due to conflicts.
+          The automatic merge of the latest blueprint (\`${BLUEPRINT_REPO}\`) into \`main\` failed due to conflicts.
 
           ### Conflicting files
 
@@ -102,9 +102,10 @@ jobs:
           git remote add blueprint https://github.com/${BLUEPRINT_REPO}.git
           git fetch blueprint main
           git checkout -b chore/sync-blueprint main
-          git rebase blueprint/main
+          git merge blueprint/main
           # resolve conflicts, then:
-          git rebase --continue
+          git add .
+          git commit
           git push --force-with-lease origin chore/sync-blueprint
           # open a PR from chore/sync-blueprint -> main
           \`\`\`
@@ -118,7 +119,7 @@ jobs:
             echo "Updated existing issue #${EXISTING}"
           else
             gh issue create \
-              --title "Blueprint sync failed: rebase conflicts" \
+              --title "Blueprint sync failed: merge conflicts" \
               --label "blueprint-sync" \
               --body "$BODY"
             echo "Created new issue"
@@ -127,11 +128,11 @@ jobs:
           exit 1
 
       - name: Push sync branch
-        if: steps.rebase.outputs.rebase_ok == 'true'
+        if: steps.merge.outputs.merge_ok == 'true'
         run: git push --force-with-lease origin chore/sync-blueprint
 
       - name: Create or update pull request
-        if: steps.rebase.outputs.rebase_ok == 'true'
+        if: steps.merge.outputs.merge_ok == 'true'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           BLUEPRINT_REPO: ${{ vars.BLUEPRINT_REPO || 'lombold/project-blueprint' }}
@@ -144,8 +145,8 @@ jobs:
           PR_BODY=$(cat <<EOF
           ## Sync with blueprint
 
-          This PR rebases \`main\` onto the latest changes from the blueprint repository
-          [\`${BLUEPRINT_REPO}\`](https://github.com/${BLUEPRINT_REPO}).
+          This PR merges the latest changes from the blueprint repository
+          [\`${BLUEPRINT_REPO}\`](https://github.com/${BLUEPRINT_REPO}) into \`main\`.
 
           ### New blueprint commits
 
