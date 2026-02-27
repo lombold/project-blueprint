@@ -1,6 +1,6 @@
-# {{projectName}}
+# {{ProjectName}}
 
-{{projectDescription}}
+{{TBD: Short project description}}
 
 ## Tech Stack
 - Backend: Java 25, Spring Boot 4.0, Spring Data JPA, H2, MapStruct, ArchUnit, Maven

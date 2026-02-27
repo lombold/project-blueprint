@@ -185,7 +185,7 @@ replace_in_files() {
 # Replace template placeholders in README.md FIRST (before generic replacements
 # would transform the inner text and leave the curly braces behind)
 if [[ -f "README.md" ]]; then
-  "${SED_INPLACE[@]}" "s|{{projectname}}|${$NEW_LOWER}|g" README.md
+  "${SED_INPLACE[@]}" "s|{{projectname}}|${NEW_LOWER}|g" README.md
   "${SED_INPLACE[@]}" "s|{{ProjectName}}|${NEW_PASCAL}|g" README.md
   "${SED_INPLACE[@]}" "s|{{project-name}}|${NEW_KEBAB}|g" README.md
   echo "    {{...}} placeholders in README.md"
