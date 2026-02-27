@@ -62,7 +62,18 @@ jobs:
         run: |
           git checkout -B chore/sync-blueprint main
 
-          if git merge blueprint/main --no-edit; then
+          MERGE_BASE=$(git merge-base HEAD blueprint/main 2>/dev/null || echo "")
+          INCOMING=""
+          if [ -n "$MERGE_BASE" ]; then
+            INCOMING=$(git log --oneline "${MERGE_BASE}..blueprint/main" --reverse)
+          fi
+
+          MERGE_MSG="chore: sync with blueprint"
+          if [ -n "$INCOMING" ]; then
+            MERGE_MSG=$(printf '%s\n\nIncoming changes:\n\n%s' "$MERGE_MSG" "$(echo "$INCOMING" | sed 's/^/- /')")
+          fi
+
+          if git merge blueprint/main -m "$MERGE_MSG"; then
             echo "merge_ok=true" >> "$GITHUB_OUTPUT"
           else
             echo "merge_ok=false" >> "$GITHUB_OUTPUT"
