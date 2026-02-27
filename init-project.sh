@@ -182,19 +182,20 @@ replace_in_files() {
   fi
 }
 
-# Replace content patterns (order: most specific first)
-replace_in_files "$OLD_CAMEL"  "$NEW_CAMEL"
-replace_in_files "$OLD_PASCAL" "$NEW_PASCAL"
-replace_in_files "$OLD_LOWER"  "$NEW_LOWER"
-replace_in_files "$OLD_KEBAB"  "$NEW_KEBAB"
-
-# Also replace the template placeholders in README.md ({{...}} variants)
+# Replace template placeholders in README.md FIRST (before generic replacements
+# would transform the inner text and leave the curly braces behind)
 if [[ -f "README.md" ]]; then
   "${SED_INPLACE[@]}" "s|{{projectName}}|${NEW_CAMEL}|g" README.md
   "${SED_INPLACE[@]}" "s|{{ProjectName}}|${NEW_PASCAL}|g" README.md
   "${SED_INPLACE[@]}" "s|{{project-name}}|${NEW_KEBAB}|g" README.md
   echo "    {{...}} placeholders in README.md"
 fi
+
+# Replace content patterns (order: most specific first)
+replace_in_files "$OLD_CAMEL"  "$NEW_CAMEL"
+replace_in_files "$OLD_PASCAL" "$NEW_PASCAL"
+replace_in_files "$OLD_LOWER"  "$NEW_LOWER"
+replace_in_files "$OLD_KEBAB"  "$NEW_KEBAB"
 
 success "File contents replaced"
 
