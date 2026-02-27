@@ -11,7 +11,7 @@
 ```
 {{project-name}}/
 ├── backend/                          # Spring Boot application
-│   ├── src/main/java/com/{{projectName}}/
+│   ├── src/main/java/com/{{projectname}}/
 │   │   ├── domain/                   # Domain layer (no dependencies)
 │   │   │   ├── entity/               # Domain entities
 │   │   │   ├── exception/            # Domain exceptions
