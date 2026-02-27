@@ -89,7 +89,7 @@ Instead of GitHub's "Use this template" (which strips git history), use the init
 
 The script derives all case variants from the kebab-case name (`myCoolApp`, `MyCoolApp`, `mycoolapp`, `my-cool-app`), replaces them across all files, renames directories and files (including the Java package), creates a private GitHub repo, and pushes.
 
-Prerequisites: `git`, `gh` (authenticated).
+Prerequisites: `git`, `gh`.
 
 ## Blueprint Sync
 
