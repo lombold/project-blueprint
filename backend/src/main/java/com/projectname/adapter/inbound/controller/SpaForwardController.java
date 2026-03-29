@@ -18,7 +18,7 @@ public class SpaForwardController {
      * Examples that forward: /ui, /ui/, /ui/users, /ui/users/42/edit
      * Examples that DON'T match (served as static files): /ui/main-abc.js, /ui/styles.css
      */
-    @GetMapping("/ui")
+    @GetMapping({"/ui", "/ui/"})
     public String forwardRoot() {
         return "forward:/ui/index.html";
     }
