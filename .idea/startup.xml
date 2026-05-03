@@ -3,7 +3,6 @@
   <component name="ProjectStartupSharedConfiguration">
     <configurations>
       <configuration id="Shell Script.Install" name="Install" />
-      <configuration id="Compound.Start" name="Start" />
     </configurations>
   </component>
 </project>
