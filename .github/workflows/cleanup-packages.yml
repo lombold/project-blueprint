@@ -1,0 +1,60 @@
+name: Cleanup Packages
+
+on:
+  schedule:
+    - cron: '0 3 * * *' # daily
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write
+  actions: write
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Delete old GHCR package versions
+        uses: actions/delete-package-versions@v5
+        with:
+          package-name: ${{ github.event.repository.name }}
+          package-type: container
+          min-versions-to-keep: 10
+
+      - name: Delete old workflow runs
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+
+          cutoff_epoch="$(date -u -d '10 days ago' +%s)"
+          page=1
+          deleted=0
+
+          while :; do
+            response="$(gh api --method GET "repos/${REPO}/actions/runs" -f per_page=100 -f page="${page}")"
+            run_count="$(jq '.workflow_runs | length' <<<"${response}")"
+
+            if [ "${run_count}" -eq 0 ]; then
+              break
+            fi
+
+            while IFS=$'\t' read -r run_id created_at; do
+              [ -z "${run_id}" ] && continue
+              created_epoch="$(date -u -d "${created_at}" +%s)"
+
+              if [ "${created_epoch}" -lt "${cutoff_epoch}" ]; then
+                if gh api --method DELETE "repos/${REPO}/actions/runs/${run_id}"; then
+                  deleted=$((deleted + 1))
+                  echo "Deleted run ${run_id} (${created_at})"
+                else
+                  echo "Failed to delete run ${run_id} (${created_at})" >&2
+                fi
+              fi
+            done < <(jq -r '.workflow_runs[] | [.id, .created_at] | @tsv' <<<"${response}")
+
+            page=$((page + 1))
+          done
+
+          echo "Deleted ${deleted} workflow runs older than 10 days"
