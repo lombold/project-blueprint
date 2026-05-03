@@ -1,0 +1,8 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="QG" type="CompoundRunConfigurationType">
+    <toRun name="All Junit" type="JUnit" />
+    <toRun name="Lint" type="js.build_tools.npm" />
+    <toRun name="All Vitest" type="JavaScriptTestRunnerVitest" />
+    <method v="2" />
+  </configuration>
+</component>
