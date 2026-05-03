@@ -2,7 +2,8 @@
 <project version="4">
   <component name="ProjectStartupSharedConfiguration">
     <configurations>
-      <configuration id="Shell Script.Install" name="Install" />
+      <configuration id="Maven.Compile" name="Compile" />
+      <configuration id="npm.Install" name="Install" />
     </configurations>
   </component>
 </project>

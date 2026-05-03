@@ -14,4 +14,14 @@
     <envs />
     <method v="2" />
   </configuration>
+  <configuration default="false" name="Install" type="js.build_tools.npm">
+    <package-json value="$PROJECT_DIR$/frontend/package.json" />
+    <command value="install" />
+    <node-interpreter value="project" />
+    <envs />
+    <EXTENSION ID="com.intellij.lang.javascript.buildTools.npm.rc.StartBrowserRunConfigurationExtension">
+      <browser name="98ca6316-2f89-46d9-a9e5-fa9e2b0625b3" />
+    </EXTENSION>
+    <method v="2" />
+  </configuration>
 </component>
