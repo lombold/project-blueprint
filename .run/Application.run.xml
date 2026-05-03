@@ -7,8 +7,8 @@
         <option name="value" value="8081" />
       </param>
     </additionalParameters>
-    <module name="project-traffix" />
-    <option name="SPRING_BOOT_MAIN_CLASS" value="com.projecttraffix.ProjectTraffixApplication" />
+    <module name="project-name" />
+    <option name="SPRING_BOOT_MAIN_CLASS" value="com.projectname.ProjectNameApplication" />
     <method v="2">
       <option name="Make" enabled="true" />
     </method>
