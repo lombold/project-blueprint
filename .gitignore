@@ -59,3 +59,4 @@ Thumbs.db
 build/
 dist/
 out/
+.idea/modules.xml
