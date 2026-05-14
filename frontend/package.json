@@ -8,21 +8,10 @@
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "lint": "ng lint",
+    "stylelint": "stylelint \"src/**/*.scss\"",
     "e2e": "ng e2e",
     "test:ci": "ng test --coverage",
     "depcruise": "dependency-cruise --config .dependency-cruiser.cjs src/app"
-  },
-  "prettier": {
-    "printWidth": 100,
-    "singleQuote": true,
-    "overrides": [
-      {
-        "files": "*.html",
-        "options": {
-          "parser": "angular"
-        }
-      }
-    ]
   },
   "private": true,
   "packageManager": "bun@1.1.30",
