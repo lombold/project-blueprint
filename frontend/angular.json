@@ -77,6 +77,10 @@
             },
             "development": {
               "buildTarget": "frontend:build:development"
+            },
+            "development-2": {
+              "buildTarget": "frontend:build:development",
+              "proxyConfig": "proxy.conf.dev2.json"
             }
           },
           "defaultConfiguration": "development"

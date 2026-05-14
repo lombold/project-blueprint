@@ -11,7 +11,6 @@ module.exports = defineConfig([
     extends: [
       eslint.configs.recommended,
       tseslint.configs.recommended,
-      tseslint.configs.stylistic,
       angular.configs.tsRecommended,
     ],
     processor: angular.processInlineTemplates,
@@ -32,6 +31,7 @@ module.exports = defineConfig([
           style: "kebab-case",
         },
       ],
+      '@angular-eslint/no-output-native': false,
     },
   },
   {
