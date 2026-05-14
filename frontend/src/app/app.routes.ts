@@ -1,6 +1,11 @@
 import { Routes } from '@angular/router';
 import { UsersPage } from '@pages/users/users.page';
 
+export interface RouteData {
+  title?: string;
+  subtitle?: string;
+}
+
 export const routes: Routes = [
   {
     path: '',
@@ -9,6 +14,9 @@ export const routes: Routes = [
   },
   {
     path: 'users',
-    component: UsersPage
+    component: UsersPage,
+    data: {
+      title: 'Users',
+    }
   },
 ];
