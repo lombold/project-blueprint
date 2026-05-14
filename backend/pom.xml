@@ -23,6 +23,7 @@
   <properties>
     <java.version>25</java.version>
     <maven.compiler.release>25</maven.compiler.release>
+    <maven-site-plugin.version>3.21.0</maven-site-plugin.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <archunit.version>1.4.1</archunit.version>
     <mapstruct.version>1.6.3</mapstruct.version>
@@ -115,6 +116,15 @@
 
   <build>
     <finalName>projectName</finalName>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-site-plugin</artifactId>
+          <version>${maven-site-plugin.version}</version>
+        </plugin>
+      </plugins>
+    </pluginManagement>
     <plugins>
       <plugin>
         <groupId>org.springframework.boot</groupId>
@@ -210,6 +220,42 @@
               <generateModelTests>false</generateModelTests>
               <generateApiDocumentation>false</generateApiDocumentation>
               <generateModelDocumentation>false</generateModelDocumentation>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-enforcer-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>enforce-build-integrity</id>
+            <goals>
+              <goal>enforce</goal>
+            </goals>
+            <configuration>
+              <rules>
+                <requireMavenVersion>
+                  <version>[3.9.9,)</version>
+                </requireMavenVersion>
+                <requireJavaVersion>
+                  <version>[25,)</version>
+                </requireJavaVersion>
+                <!-- No SNAPSHOT deps in normal builds. -->
+                <requireReleaseDeps>
+                  <message>No SNAPSHOT dependencies allowed.</message>
+                </requireReleaseDeps>
+                <!-- All plugins must have explicit versions. -->
+                <requirePluginVersions>
+                  <message>Pin all Maven plugin versions.</message>
+                </requirePluginVersions>
+                <!-- Avoid duplicate dependency declarations. -->
+                <banDuplicatePomDependencyVersions />
+                <!-- Detect dependency graph conflicts. -->
+                <dependencyConvergence />
+                <!-- Avoid dynamic/version-range dependency declarations. -->
+                <requireUpperBoundDeps />
+              </rules>
             </configuration>
           </execution>
         </executions>
