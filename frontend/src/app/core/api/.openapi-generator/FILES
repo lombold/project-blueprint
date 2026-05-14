@@ -9,9 +9,12 @@ configuration.ts
 encoder.ts
 git_push.sh
 index.ts
+model/error-response.ts
 model/health-status.ts
 model/models.ts
 model/user.ts
+model/validation-error-response.ts
+model/validation-error.ts
 param.ts
 provide-api.ts
 query.params.ts
