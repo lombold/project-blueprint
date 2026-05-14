@@ -43,6 +43,7 @@
     "jsdom": "^27.4.0",
     "playwright-ng-schematics": "^21.1.0",
     "postcss": "^8.5.14",
+    "prettier": "^3.8.3",
     "stylelint": "14.16.1",
     "stylelint-config-prettier": "^9.0.5",
     "stylelint-config-standard-scss": "6.1.0",
