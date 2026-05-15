@@ -3,7 +3,7 @@
 set -euo pipefail
 
 git fetch blueprint main
-git checkout chore/sync-blueprint
+git checkout -B chore/sync-blueprint
 git merge blueprint/main || true
 
 read -p "Have you resolved all conflicts? (y/n) " -n 1 -r
