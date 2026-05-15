@@ -10,7 +10,7 @@ read -p "Have you resolved all conflicts? (y/n) " -n 1 -r
 echo    # move to a new line
 if [[ $REPLY =~ ^[Yy]$ ]]; then
     git add .
-    git commit -m "chore: sync with blueprint main"
+    git commit -m "chore: sync with blueprint main" || true
     git checkout main
     git merge chore/sync-blueprint
 
