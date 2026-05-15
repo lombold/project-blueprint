@@ -1,4 +1,4 @@
 [install]
 minimumReleaseAge = 259200 # 3 days
 frozenLockfile = true
-ignoreScripts = false
+ignoreScripts = true
