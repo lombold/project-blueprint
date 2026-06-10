@@ -1,0 +1,14 @@
+spring:
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+      settings:
+        # Never accept console connections from other hosts, even in dev.
+        web-allow-others: false
+
+logging:
+  level:
+    com.projectname: DEBUG
+    org.springframework.web: DEBUG
+    org.springframework.boot.web.servlet.error: DEBUG

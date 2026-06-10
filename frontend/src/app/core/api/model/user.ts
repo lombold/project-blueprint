@@ -10,10 +10,10 @@
 
 
 export interface User { 
-    id?: number;
+    readonly id?: number;
     username: string;
     email: string;
-    createdAt?: string;
-    updatedAt?: string;
+    readonly createdAt?: string;
+    readonly updatedAt?: string;
 }
 
