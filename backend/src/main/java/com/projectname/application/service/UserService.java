@@ -19,7 +19,9 @@ public class UserService implements UserUseCase {
 
   @Override
   public User createUser(User user) {
-    user.setId(null); // prevent client-supplied id from overwriting an existing row via save()
+    // Ignore any client-supplied id: with a non-null id, save() would update
+    // an existing row instead of creating a new one (mass assignment).
+    user.setId(null);
     OffsetDateTime now = OffsetDateTime.now();
     user.setCreatedAt(now);
     user.setUpdatedAt(now);
