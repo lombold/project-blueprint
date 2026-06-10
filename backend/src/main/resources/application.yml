@@ -16,7 +16,6 @@ spring:
     password:
   h2:
     console:
-      # Disabled by default; enabled only for the `dev` profile (application-dev.yml).
       enabled: false
 
 logging:
@@ -27,7 +26,6 @@ management:
   endpoints:
     web:
       exposure:
-        # Expose only the health endpoint (used by Docker/CI health checks).
         include: health
   endpoint:
     health:
@@ -36,8 +34,6 @@ management:
 server:
   port: 8080
   error:
-    # Never leak exception details through the default error response;
-    # GlobalExceptionHandler produces the API error contract.
     include-message: never
     include-stacktrace: never
     include-exception: false
