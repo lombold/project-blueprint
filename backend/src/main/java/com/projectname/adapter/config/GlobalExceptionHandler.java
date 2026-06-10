@@ -5,6 +5,7 @@ import com.projectname.adapter.inbound.controller.dto.ValidationErrorDto;
 import com.projectname.adapter.inbound.controller.dto.ValidationErrorResponseDto;
 import com.projectname.domain.exception.DomainException;
 import com.projectname.domain.exception.ResourceNotFoundException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
@@ -22,6 +23,7 @@ import java.time.OffsetDateTime;
  * Handles domain and validation exceptions with appropriate HTTP responses.
  */
 @ControllerAdvice
+@Slf4j
 public class GlobalExceptionHandler {
 
     /**
@@ -135,6 +137,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ResponseEntity<ErrorResponseDto> handleGenericException(final Exception ex, final WebRequest request) {
+        log.error("Unhandled exception while processing request", ex);
         final var error = ErrorResponseDto.builder()
                 .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
                 .message("An internal server error occurred")
