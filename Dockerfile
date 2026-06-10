@@ -6,7 +6,7 @@ WORKDIR /app/frontend
 # Copy frontend files
 COPY frontend/package.json frontend/bun.lock* ./
 
-# Install dependencies using bun (frozen lockfile for reproducible, tamper-resistant builds)
+# Install dependencies using bun
 RUN npm install -g bun && bun install --frozen-lockfile
 
 # Copy frontend source code
@@ -41,7 +41,6 @@ FROM eclipse-temurin:25-jre-alpine
 
 WORKDIR /app
 
-# Run as an unprivileged user
 RUN addgroup -S app && adduser -S app -G app
 USER app
 
