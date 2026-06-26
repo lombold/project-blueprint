@@ -3,7 +3,7 @@
 {{TBD: Short project description}}
 
 ## Tech Stack
-- Backend: Java 25, Spring Boot 4.0, Spring Data JPA, H2, MapStruct, ArchUnit, Maven
+- Backend: Java 25, Spring Boot 4.0, Spring Data JPA, H2, Flyway, MapStruct, ArchUnit, Maven
 - Frontend: Angular 21, TypeScript 5.9, Tailwind CSS 4.1, RxJS 7.8, Vitest 4, Playwright 1.58, Bun 1.1.30
 - Tooling: Docker, GitHub Actions
 
@@ -26,8 +26,9 @@
 │   │   └── {{ProjectName}}Application.java
 │   ├── src/main/resources/
 │   │   ├── application.yml           # Spring configuration
-│   │   ├── schema.sql                # H2 schema
-│   │   └── data.sql                  # Sample data
+│   │   └── db/migration/             # Flyway SQL
+│   │       ├── current/              # Local development snapshot
+│   │       └── incremental/          # Forward-only migrations
 │   ├── src/test/java/                # Unit & integration tests
 │   └── pom.xml                       # Maven dependencies
 │
@@ -65,8 +66,33 @@
 ## Commands
 Backend (run from `backend/`):
 - start: `mvn spring-boot:run`
+- start with local snapshot: `mvn spring-boot:run -Dspring-boot.run.profiles=local`
 - test: `mvn test`
 - lint: not configured
+
+## Database Migrations
+
+Flyway runs on backend startup and validates the database before Hibernate validates the JPA
+mapping. Hibernate DDL generation is disabled (`ddl-auto: validate`), so database structure must
+come from Flyway.
+
+Migration folders:
+- `backend/src/main/resources/db/migration/incremental/`: production-style forward-only migrations.
+  These are versioned `V...__description.sql` files and should not be edited after they have been
+  committed or applied anywhere.
+- `backend/src/main/resources/db/migration/current/`: local development snapshot. This folder is used
+  only with the `local` Spring profile and contains a destructive repeatable migration that rebuilds
+  the local H2 schema from the current desired state.
+
+Recommended workflow:
+1. During local schema design, update
+   `backend/src/main/resources/db/migration/current/R__current_schema.sql`.
+2. Start the backend with `mvn spring-boot:run -Dspring-boot.run.profiles=local` to rebuild and
+   validate the local database.
+3. When the schema change is ready, create an immutable migration:
+   `backend/scripts/new-migration.sh add-user-status`.
+4. Add the equivalent forward-only SQL to the generated file in `incremental/`.
+5. Run `cd backend && mvn test`.
 
 Frontend (run from `frontend/`):
 - install: `bun install`
