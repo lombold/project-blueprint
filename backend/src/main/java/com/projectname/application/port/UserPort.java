@@ -2,7 +2,6 @@ package com.projectname.application.port;
 
 import com.projectname.domain.entity.User;
 import com.projectname.domain.value.UserId;
-
 import java.util.List;
 import java.util.Optional;
 
@@ -12,41 +11,41 @@ import java.util.Optional;
  */
 public interface UserPort {
 
-  /**
-   * Saves a user (create or update).
-   *
-   * @param user the user to save
-   * @return the saved user with ID populated
-   */
-  User save(User user);
+    /**
+     * Saves a user (create or update).
+     *
+     * @param user the user to save
+     * @return the saved user with ID populated
+     */
+    User save(User user);
 
-  /**
-   * Retrieves a user by ID.
-   *
-   * @param id the user ID
-   * @return an Optional containing the user if found
-   */
-  Optional<User> findById(UserId id);
+    /**
+     * Retrieves a user by ID.
+     *
+     * @param id the user ID
+     * @return an Optional containing the user if found
+     */
+    Optional<User> findById(UserId id);
 
-  /**
-   * Retrieves all users.
-   *
-   * @return a list of all users
-   */
-  List<User> findAll();
+    /**
+     * Retrieves all users.
+     *
+     * @return a list of all users
+     */
+    List<User> findAll();
 
-  /**
-   * Retrieves a user by username.
-   *
-   * @param username the username
-   * @return an Optional containing the user if found
-   */
-  Optional<User> findByUsername(String username);
+    /**
+     * Retrieves a user by username.
+     *
+     * @param username the username
+     * @return an Optional containing the user if found
+     */
+    Optional<User> findByUsername(String username);
 
-  /**
-   * Deletes a user by ID.
-   *
-   * @param id the user ID
-   */
-  void deleteById(UserId id);
+    /**
+     * Deletes a user by ID.
+     *
+     * @param id the user ID
+     */
+    void deleteById(UserId id);
 }

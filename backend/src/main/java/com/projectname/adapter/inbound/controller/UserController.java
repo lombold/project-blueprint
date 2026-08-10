@@ -4,12 +4,11 @@ import com.projectname.adapter.inbound.controller.dto.UserDto;
 import com.projectname.adapter.inbound.controller.mapper.UserMapper;
 import com.projectname.application.port.in.UserUseCase;
 import com.projectname.domain.value.UserId;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.List;
 
 /**
  * REST controller for user management.
@@ -25,9 +24,7 @@ public class UserController implements UsersApi {
     @Override
     public ResponseEntity<List<UserDto>> listUsers() {
         final var users = userUseCase.getAllUsers();
-        final var userDTOs = users.stream()
-                .map(userMapper::toDto)
-                .toList();
+        final var userDTOs = users.stream().map(userMapper::toDto).toList();
         return ResponseEntity.ok(userDTOs);
     }
 

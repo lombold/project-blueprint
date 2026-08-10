@@ -7,7 +7,7 @@ import org.mapstruct.Mapper;
 @Mapper(uses = {UserJpaIdMapper.class})
 public interface UserJpaMapper {
 
-  UserJpaEntity toJpaEntity(User user);
+    UserJpaEntity toJpaEntity(User user);
 
-  User toDomain(UserJpaEntity userJpaEntity);
+    User toDomain(UserJpaEntity userJpaEntity);
 }
