@@ -12,23 +12,21 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 /** Unit tests for SpaForwardController. */
 class SpaForwardControllerTest {
 
-  private MockMvc mockMvc;
+    private MockMvc mockMvc;
 
-  @BeforeEach
-  void setUp() {
-    mockMvc = MockMvcBuilders.standaloneSetup(new SpaForwardController()).build();
-  }
+    @BeforeEach
+    void setUp() {
+        mockMvc = MockMvcBuilders.standaloneSetup(new SpaForwardController()).build();
+    }
 
-  @Test
-  void shouldForwardUiRootWithTrailingSlash() throws Exception {
-    // Given
+    @Test
+    void shouldForwardUiRootWithTrailingSlash() throws Exception {
+        // Given
 
-    // When
-    final var response = mockMvc.perform(get("/ui/"));
+        // When
+        final var response = mockMvc.perform(get("/ui/"));
 
-    // Then
-    response
-        .andExpect(status().isOk())
-        .andExpect(forwardedUrl("/ui/index.html"));
-  }
+        // Then
+        response.andExpect(status().isOk()).andExpect(forwardedUrl("/ui/index.html"));
+    }
 }

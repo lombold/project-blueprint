@@ -6,13 +6,13 @@ import java.util.List;
 
 public interface UserUseCase {
 
-  User createUser(User user);
+    User createUser(User user);
 
-  User getUserById(UserId id);
+    User getUserById(UserId id);
 
-  List<User> getAllUsers();
+    List<User> getAllUsers();
 
-  User updateUser(UserId id, User userUpdates);
+    User updateUser(UserId id, User userUpdates);
 
-  void deleteUser(UserId id);
+    void deleteUser(UserId id);
 }

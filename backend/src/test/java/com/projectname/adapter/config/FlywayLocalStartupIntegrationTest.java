@@ -14,30 +14,30 @@ import org.springframework.test.context.ActiveProfiles;
  */
 @ActiveProfiles("local")
 @SpringBootTest(
-    properties = {
-      "spring.datasource.url=jdbc:h2:mem:flyway-local-startup;DB_CLOSE_DELAY=-1",
-      "spring.datasource.username=sa",
-      "spring.datasource.password="
-    })
+        properties = {
+            "spring.datasource.url=jdbc:h2:mem:flyway-local-startup;DB_CLOSE_DELAY=-1",
+            "spring.datasource.username=sa",
+            "spring.datasource.password="
+        })
 class FlywayLocalStartupIntegrationTest {
 
-  @Autowired
-  private Flyway flyway;
+    @Autowired
+    private Flyway flyway;
 
-  @Autowired
-  private JdbcTemplate jdbcTemplate;
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
 
-  @Test
-  void shouldRunCurrentSnapshotForLocalProfileBeforeHibernateValidation() {
-    // Given
-    final var appliedMigrations = flyway.info().applied();
+    @Test
+    void shouldRunCurrentSnapshotForLocalProfileBeforeHibernateValidation() {
+        // Given
+        final var appliedMigrations = flyway.info().applied();
 
-    // When
-    final var userCount = jdbcTemplate.queryForObject("SELECT COUNT(*) FROM users", Integer.class);
+        // When
+        final var userCount = jdbcTemplate.queryForObject("SELECT COUNT(*) FROM users", Integer.class);
 
-    // Then
-    assertEquals(3, userCount);
-    assertEquals(1, appliedMigrations.length);
-    assertEquals("R__current_schema.sql", appliedMigrations[0].getScript());
-  }
+        // Then
+        assertEquals(3, userCount);
+        assertEquals(1, appliedMigrations.length);
+        assertEquals("R__current_schema.sql", appliedMigrations[0].getScript());
+    }
 }

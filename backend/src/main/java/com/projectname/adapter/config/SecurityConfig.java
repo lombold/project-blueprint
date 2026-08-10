@@ -18,8 +18,7 @@ import org.springframework.security.web.header.writers.ReferrerPolicyHeaderWrite
 public class SecurityConfig {
 
     // style-src 'unsafe-inline' is required: Angular injects component styles at runtime.
-    private static final String CONTENT_SECURITY_POLICY =
-            "default-src 'self'; "
+    private static final String CONTENT_SECURITY_POLICY = "default-src 'self'; "
             + "script-src 'self'; "
             + "style-src 'self' 'unsafe-inline'; "
             + "img-src 'self' data:; "
@@ -36,8 +35,7 @@ public class SecurityConfig {
     @Profile("dev")
     @Order(1)
     SecurityFilterChain h2ConsoleFilterChain(final HttpSecurity http) {
-        return http
-                .securityMatcher("/h2-console/**")
+        return http.securityMatcher("/h2-console/**")
                 .csrf(AbstractHttpConfigurer::disable)
                 .headers(headers -> headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::sameOrigin))
                 .authorizeHttpRequests(auth -> auth.anyRequest().permitAll())
@@ -46,12 +44,10 @@ public class SecurityConfig {
 
     @Bean
     SecurityFilterChain securityFilterChain(final HttpSecurity http) {
-        return http
-                .csrf(AbstractHttpConfigurer::disable)
+        return http.csrf(AbstractHttpConfigurer::disable)
                 .cors(Customizer.withDefaults())
                 .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .headers(headers -> headers
-                        .contentSecurityPolicy(csp -> csp.policyDirectives(CONTENT_SECURITY_POLICY))
+                .headers(headers -> headers.contentSecurityPolicy(csp -> csp.policyDirectives(CONTENT_SECURITY_POLICY))
                         .frameOptions(HeadersConfigurer.FrameOptionsConfig::sameOrigin)
                         .referrerPolicy(referrer -> referrer.policy(
                                 ReferrerPolicyHeaderWriter.ReferrerPolicy.STRICT_ORIGIN_WHEN_CROSS_ORIGIN)))

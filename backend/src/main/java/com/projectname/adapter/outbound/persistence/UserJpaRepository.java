@@ -1,6 +1,5 @@
 package com.projectname.adapter.outbound.persistence;
 
-import com.projectname.domain.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -11,5 +10,5 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface UserJpaRepository extends JpaRepository<UserJpaEntity, Long> {
 
-  UserJpaEntity findByUsername(String username);
+    UserJpaEntity findByUsername(String username);
 }

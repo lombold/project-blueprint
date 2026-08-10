@@ -5,6 +5,7 @@ import com.projectname.adapter.inbound.controller.dto.ValidationErrorDto;
 import com.projectname.adapter.inbound.controller.dto.ValidationErrorResponseDto;
 import com.projectname.domain.exception.DomainException;
 import com.projectname.domain.exception.ResourceNotFoundException;
+import java.time.OffsetDateTime;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,8 +16,6 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.context.request.WebRequest;
-
-import java.time.OffsetDateTime;
 
 /**
  * Global exception handler for the application.
@@ -54,8 +53,7 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(DomainException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ResponseEntity<ErrorResponseDto> handleDomainException(
-            final DomainException ex, final WebRequest request) {
+    public ResponseEntity<ErrorResponseDto> handleDomainException(final DomainException ex, final WebRequest request) {
         final var error = ErrorResponseDto.builder()
                 .status(HttpStatus.BAD_REQUEST.value())
                 .message(ex.getMessage())
@@ -91,13 +89,9 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ResponseEntity<ValidationErrorResponseDto> handleValidationException(
-            final MethodArgumentNotValidException ex
-    ) {
+            final MethodArgumentNotValidException ex) {
 
-        final var errors = ex
-                .getBindingResult()
-                .getAllErrors()
-                .stream()
+        final var errors = ex.getBindingResult().getAllErrors().stream()
                 .map(this::mapError)
                 .toList();
 
@@ -114,18 +108,11 @@ public class GlobalExceptionHandler {
     private ValidationErrorDto mapError(final ObjectError error) {
 
         if (error instanceof final FieldError fieldError) {
-            return new ValidationErrorDto(
-                    fieldError.getDefaultMessage(),
-                    fieldError.getField()
-            );
+            return new ValidationErrorDto(fieldError.getDefaultMessage(), fieldError.getField());
         }
 
-        return new ValidationErrorDto(
-                error.getDefaultMessage(),
-                error.getObjectName()
-        );
+        return new ValidationErrorDto(error.getDefaultMessage(), error.getObjectName());
     }
-
 
     /**
      * Handles generic exceptions.
@@ -145,5 +132,4 @@ public class GlobalExceptionHandler {
                 .build();
         return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
     }
-
 }
