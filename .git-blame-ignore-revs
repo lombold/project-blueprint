@@ -1,0 +1,5 @@
+# Bulk reformats — noise in `git blame`. GitHub honours this file automatically.
+# Locally: git config blame.ignoreRevsFile .git-blame-ignore-revs
+
+# style: format all backend Java sources with palantir-java-format
+e78be7fd33e9b83bd4ac70a8d4f163e18384c342

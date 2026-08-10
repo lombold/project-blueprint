@@ -24,6 +24,11 @@ jobs:
           distribution: 'temurin'
           cache: maven
       
+      # Fails fast with a clear signal; `verify` also runs this via the validate phase.
+      - name: Check backend formatting
+        working-directory: ./backend
+        run: mvn spotless:check
+
       - name: Build and test backend
         working-directory: ./backend
         run: mvn clean verify
