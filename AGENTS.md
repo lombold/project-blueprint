@@ -10,6 +10,8 @@ mvn spring-boot:run                          # start on :8080
 mvn test                                     # all tests (unit + ArchUnit)
 mvn test -Dtest=UserControllerTest           # single test class
 mvn test -Dtest=UserControllerTest#shouldGetAllUsers  # single test method
+mvn spotless:apply                           # auto-format Java sources
+mvn spotless:check                           # verify formatting (also runs in `validate`)
 mvn clean verify                             # full build + test (CI)
 ```
 
@@ -106,10 +108,10 @@ frontend/src/app/
 ## Code Style
 
 ### Java
-- **Formatting**: 2-space indent (IDE config). Opening brace on same line. Blank line between methods.
+- **Formatting**: owned by Spotless + palantir-java-format — 4-space indent, 120-column limit. Never hand-format; run `mvn spotless:apply`. `spotless:check` is bound to the `validate` phase, so any Maven build fails on unformatted code.
 - **Local variables**: prefer `final var` for type inference (`final var users = ...`).
 - **Method params**: mark `final` (`public ResponseEntity<UserDto> getUserById(final Long id)`).
-- **Imports**: explicit imports, no wildcards. Order: project imports, then `java.*`, then third-party.
+- **Imports**: static imports first, then non-static, each alphabetically — applied by the formatter, don't sort by hand. Unused imports are stripped automatically. Prefer explicit imports over wildcards; the formatter neither creates nor expands wildcards, so that one is convention, not enforcement.
 - **Annotations**: Lombok `@Getter @Setter @Builder @RequiredArgsConstructor @AllArgsConstructor @NoArgsConstructor` on adapter/application classes. Domain should avoid Lombok (current code uses it — follow existing pattern until refactored).
 - **No `@Autowired` field injection** (enforced by ArchUnit). Use constructor injection via `@RequiredArgsConstructor`.
 - **Javadoc**: on public classes and port interfaces. Test classes get a one-line class-level doc.
