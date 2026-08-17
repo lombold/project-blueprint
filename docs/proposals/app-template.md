@@ -18,6 +18,7 @@ Composer is not part of the proposed stack.
 - Generate web and mobile API clients from the existing OpenAPI contract.
 - Support browser-based app development plus native Android and iOS builds.
 - Preserve the existing Angular 21 standalone, signals-first, and Bun conventions.
+- Use official Ionic, Angular, and Capacitor commands to generate and initialize project artifacts.
 - Keep web and mobile presentation layers independent.
 - Make application name and native bundle identifier part of blueprint initialization.
 - Add CI checks for the app without changing how the web frontend is packaged and deployed.
@@ -93,6 +94,49 @@ The app will use:
 
 The exact compatible dependency versions will be resolved and locked when the scaffold is created.
 Angular remains on the same major and minor line as `frontend/`.
+
+### Command-driven scaffolding and initialization
+
+The implementation must start from the official generators instead of manually reconstructing an
+Ionic or native project. From the repository root, the initial sequence is:
+
+```bash
+# Confirm the available starter and flags before generating.
+bunx @ionic/cli start --list
+bunx @ionic/cli start --help
+
+# Generate a standalone Angular app and initialize its Capacitor integration.
+bunx @ionic/cli start app blank --type=angular --capacitor --no-deps --no-git
+
+cd app
+bun install
+
+# Generate the native projects from the initialized Capacitor configuration.
+bunx cap add android
+bunx cap add ios
+
+# Build the web assets and synchronize plugins/configuration into both projects.
+bun run build
+bunx cap sync
+```
+
+`ionic start --capacitor` is the initialization command; a second `cap init` must not be run over
+the generated configuration. Before committing the scaffold, verify the generated Angular version
+against `frontend/package.json` and use supported Angular update commands if alignment is required.
+Do not hand-convert an outdated generated module application into a standalone application.
+
+Subsequent framework artifacts must also begin with the relevant generator, for example:
+
+```bash
+cd app
+bunx @ionic/cli generate page pages/users
+bunx ng generate service core/services/example
+bunx ng generate component shared/components/example
+```
+
+Generated output may then be adapted to the blueprint's inline-template, OnPush, signals-first,
+testing, and dependency-boundary conventions. Configuration files and domain-specific code remain
+normal deliberate edits; the command requirement applies to framework and native scaffolding.
 
 ### OpenAPI remains the source of truth
 
@@ -275,10 +319,11 @@ for device-level flows.
 
 ### Increment 1: Buildable app shell
 
-- Scaffold the Angular 21 standalone Ionic application under `app/`.
+- Use `ionic start --capacitor` to generate and initialize the Angular 21 standalone application
+  under `app/`; retain the generator output as the starting point for all subsequent changes.
 - Configure Ionic routing, Vitest, linting, dependency boundaries, and Bun.
 - Configure `www/index.html` output and Capacitor.
-- Add and commit the Android and iOS projects.
+- Use `cap add android` and `cap add ios`, then add and commit the generated native projects.
 - Add app documentation and CI Angular-build checks.
 
 Exit criteria: the app builds, tests, renders in a browser, synchronizes into both native projects,
@@ -298,6 +343,8 @@ contract and present a useful error state when the backend is unavailable.
 ### Increment 3: Blueprint lifecycle
 
 - Extend and test `init-project.sh` project and native identifier replacement.
+- Run the real initialization command against a temporary target and build the generated backend,
+  web client, and app; do not validate initialization through mocked file replacements alone.
 - Update `README.md`, `AGENTS.md`, Docker documentation, and development commands.
 - Add native icons and splash assets with documented regeneration commands.
 - Verify blueprint synchronization does not treat native build output as source.
@@ -363,6 +410,8 @@ project templates or a standard path to native capabilities and app-store distri
 The proposal is implemented when:
 
 - `backend/`, `frontend/`, and `app/` are independently buildable.
+- The Ionic application and native projects originate from the documented CLI generation and
+  initialization commands rather than a hand-created skeleton.
 - The app uses standalone Ionic components, signals-first Angular patterns, and lazy routes.
 - Android and iOS projects build from a clean checkout.
 - Both Angular clients are generated from the same OpenAPI document.
