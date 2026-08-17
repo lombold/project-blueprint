@@ -1,0 +1,42 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title>Users</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <ion-header collapse="condense">
+    <ion-toolbar>
+      <ion-title size="large">Users</ion-title>
+    </ion-toolbar>
+  </ion-header>
+
+  @if (users.isLoading()) {
+    <section class="state" aria-live="polite">
+      <ion-spinner name="crescent" />
+      <p>Loading users...</p>
+    </section>
+  } @else if (users.error()) {
+    <section class="state" aria-live="polite">
+      <h2>Could not load users.</h2>
+      <p>Check the API connection and try again.</p>
+      <ion-button (click)="retry()">Try again</ion-button>
+    </section>
+  } @else if (hasUsers()) {
+    <ion-list inset="true">
+      @for (user of users.value(); track user.id ?? user.email) {
+        <ion-item>
+          <ion-label>
+            <h2>{{ user.username }}</h2>
+            <p>{{ user.email }}</p>
+          </ion-label>
+        </ion-item>
+      }
+    </ion-list>
+  } @else {
+    <section class="state">
+      <h2>No users found.</h2>
+      <p>Create a user through the API to see it here.</p>
+    </section>
+  }
+</ion-content>

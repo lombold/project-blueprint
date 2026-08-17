@@ -46,6 +46,14 @@ server:
     include-stacktrace: never
     include-exception: false
 
+app:
+  cors:
+    allowed-origins:
+      - http://localhost:4200
+      - http://localhost:8100
+      - capacitor://localhost
+      - https://localhost
+
 ---
 spring:
   config:

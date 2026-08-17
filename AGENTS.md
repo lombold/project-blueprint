@@ -1,6 +1,6 @@
 # ProjectName — Agent Guide
 
-Mono-repo: Spring Boot 4.0 backend (Java 25, hexagonal) + Angular 21 frontend (Bun, signals, Tailwind v4).
+Mono-repo: Spring Boot 4.0 backend (Java 25, hexagonal) + Angular 21 web frontend + Ionic 8/Angular 21/Capacitor 8 app (Bun, signals).
 
 ## Build / Test / Lint Commands
 
@@ -26,6 +26,20 @@ bun run test:ci                              # tests with V8 coverage
 bun run lint                                 # lint
 bun run depcruise                            # boundary checks
 bun run e2e                                  # Playwright E2E (Chromium)
+```
+
+### App (run from `app/`, package manager: Bun)
+```
+bun install                                  # install deps
+bun run start                                # browser dev server on :4200
+bun run build                                # production web build to www/
+bun run test -- --watch=false                # Vitest unit tests
+bun run test:ci                              # tests with V8 coverage
+bun run lint                                 # lint
+bun run depcruise                            # boundary checks
+bun run sync                                 # build and sync both native projects
+bun run android                              # open the Android project
+bun run ios                                  # open the iOS project
 ```
 
 ### Docker
@@ -65,9 +79,9 @@ Base package: `com.projectname`. Three rings with strict dependency rules enforc
 - Domain exceptions: `DomainException`, `ResourceNotFoundException` (both extend `RuntimeException`).
 - Global error handling: `GlobalExceptionHandler` (`@ControllerAdvice`) maps exceptions to HTTP status codes.
 - DB: H2 in-memory. Schema in `schema.sql`, seed data in `data.sql`.
-- OpenAPI: single `openapi.yml` generates both backend interfaces/DTOs and frontend API client.
+- OpenAPI: single `openapi.yml` generates backend interfaces/DTOs and the web/app API clients.
 
-## Architecture — Frontend
+## Architecture — Angular Clients
 
 ### Folder structure
 ```
@@ -87,6 +101,10 @@ frontend/src/app/
     utils/
 ```
 
+The app mirrors these boundaries under `app/src/app/`. Its native shells live in `app/android/`
+and `app/ios/`; modify them only for platform-specific capabilities. Web assets copied by
+`cap sync` are generated and must not be committed.
+
 ### Import rules (enforced by dependency-cruiser)
 - `core/` must NOT import from `pages/`
 - `shared/` must NOT import from `core/` or `pages/`
@@ -104,6 +122,9 @@ frontend/src/app/
 - Component selector prefix: `app-` (kebab-case). Directive prefix: `app` (camelCase).
 - Page components: class named `*Page`, selector `app-{feature}`, file `{feature}.page.ts`.
 - Protect component internals with `protected` or `readonly` where appropriate.
+- In app pages, import Ionic standalone components from `@ionic/angular/standalone`.
+- Configure native identity in `app/capacitor.config.ts`; the initializer replaces the placeholder
+  app ID in Capacitor, Android, and iOS files.
 
 ## Code Style
 
@@ -136,13 +157,14 @@ frontend/src/app/
 - Business rule violations: throw `DomainException`.
 - `GlobalExceptionHandler` maps: `ResourceNotFoundException` -> 404, `DomainException` -> 400, `IllegalArgumentException` -> 400, unhandled `Exception` -> 500 (generic message, no stack leak).
 
-### Frontend
+### Angular clients
 - `rxResource` exposes `.error()` signal — use `computed()` to derive error state.
 - HTTP errors in manual subscribes: `subscribe({ error: (err) => console.error(...) })`.
 - Template: `@if (loadError())` blocks for user-facing error messages.
 
 ## CI (`.github/workflows/`)
-- **test.yml**: push/PR to `main`. Backend: Java 25, `mvn clean verify`. Frontend: `bun run test:ci`, `bun run lint`.
+- **test.yml**: push/PR to `main`. Backend plus generated-client drift, web checks, and app checks.
+- **app-native.yml**: Android debug build on Linux and unsigned iOS simulator build on macOS.
 - **docker.yml**: after test passes on `main`. Multi-stage Docker build, pushes to GHCR.
 - **e2e.yml**: after Docker build. Playwright against containerized app.
 

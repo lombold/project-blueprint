@@ -19,3 +19,4 @@
 **/docker-compose.yml
 **/Dockerfile.dev
 **/coverage
+app

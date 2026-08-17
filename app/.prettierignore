@@ -1,0 +1,6 @@
+android/
+coverage/
+ios/
+node_modules/
+src/app/core/api/
+www/

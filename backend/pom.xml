@@ -216,7 +216,30 @@
                             <generatorName>typescript-angular</generatorName>
                             <output>${project.basedir}/../frontend/src/app/core/api</output>
                             <configOptions>
-                                <ngVersion>21.1.0</ngVersion>
+                                <ngVersion>21.2.0</ngVersion>
+                                <providedInRoot>true</providedInRoot>
+                                <modelPackage>models</modelPackage>
+                                <apiPackage>services</apiPackage>
+                                <fileNaming>kebab-case</fileNaming>
+                                <stringEnums>true</stringEnums>
+                            </configOptions>
+                            <generateApiTests>false</generateApiTests>
+                            <generateModelTests>false</generateModelTests>
+                            <generateApiDocumentation>false</generateApiDocumentation>
+                            <generateModelDocumentation>false</generateModelDocumentation>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>generate-app-openapi</id>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                        <configuration>
+                            <inputSpec>${project.basedir}/src/main/resources/openapi.yml</inputSpec>
+                            <generatorName>typescript-angular</generatorName>
+                            <output>${project.basedir}/../app/src/app/core/api</output>
+                            <configOptions>
+                                <ngVersion>21.2.0</ngVersion>
                                 <providedInRoot>true</providedInRoot>
                                 <modelPackage>models</modelPackage>
                                 <apiPackage>services</apiPackage>

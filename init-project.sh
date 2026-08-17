@@ -3,23 +3,24 @@
 # init-project.sh — Clone the blueprint and create a new project from it.
 #
 # Usage:
-#   ./init-project.sh <kebab-case-name> <github-owner> [target-dir]
+#   ./init-project.sh <kebab-case-name> <github-owner> --app-id <reverse-dns-id> [--target-dir <path>]
 #
 # Example:
-#   ./init-project.sh my-cool-app lombold
-#   ./init-project.sh my-cool-app lombold ~/Projects/my-cool-app
+#   ./init-project.sh my-cool-app lombold --app-id ch.lombold.mycoolapp
+#   ./init-project.sh my-cool-app lombold --app-id ch.lombold.mycoolapp --target-dir ~/Projects/my-cool-app
 #
 # What it does:
 #   1. Clones the blueprint repo (full history preserved)
 #   2. Derives all case variants from the kebab-case name
 #   3. Replaces all references in file contents
 #   4. Renames files and directories
-#   5. Replaces template placeholders in README.md
-#   6. Re-points the git origin to the new GitHub repo
-#   7. Creates the GitHub repo and pushes
+#   5. Regenerates OpenAPI clients for the renamed contract
+#   6. Replaces template placeholders in README.md
+#   7. Re-points the git origin to the new GitHub repo
+#   8. Creates the GitHub repo and pushes
 #
 # Prerequisites:
-#   - git, gh (GitHub CLI, authenticated), sed, find
+#   - git, gh (GitHub CLI, authenticated), Java 25, Maven, sed, find
 #
 set -euo pipefail
 
@@ -36,6 +37,15 @@ die() { echo -e "${RED}ERROR: $*${NC}" >&2; exit 1; }
 info() { echo -e "${CYAN}→ $*${NC}"; }
 success() { echo -e "${GREEN}✓ $*${NC}"; }
 warn() { echo -e "${YELLOW}⚠ $*${NC}"; }
+
+usage() {
+  echo "Usage: $0 <kebab-case-name> <github-owner> --app-id <reverse-dns-id> [--target-dir <path>]"
+  echo ""
+  echo "  <kebab-case-name>  New project name in kebab-case (e.g., my-cool-app)"
+  echo "  <github-owner>     GitHub user or org (e.g., lombold)"
+  echo "  --app-id           Native application ID (e.g., ch.lombold.mycoolapp)"
+  echo "  --target-dir       Where to create the project (default: ./<name>)"
+}
 
 # Convert kebab-case to camelCase:  my-cool-app → myCoolApp
 to_camel() {
@@ -73,20 +83,53 @@ BLUEPRINT_REPO="lombold/project-blueprint"
 
 NEW_NAME="${1:-}"
 GITHUB_OWNER="${2:-}"
-TARGET_DIR="${3:-}"
+TARGET_DIR=""
+APP_ID=""
+
+if [[ "$NEW_NAME" == "-h" || "$NEW_NAME" == "--help" ]]; then
+  usage
+  exit 0
+fi
 
 if [[ -z "$NEW_NAME" || -z "$GITHUB_OWNER" ]]; then
-  echo "Usage: $0 <kebab-case-name> <github-owner> [target-dir]"
-  echo ""
-  echo "  <kebab-case-name>  New project name in kebab-case (e.g., my-cool-app)"
-  echo "  <github-owner>     GitHub user or org (e.g., lombold)"
-  echo "  [target-dir]       Where to create the project (default: ./<name>)"
+  usage
   exit 1
 fi
+
+shift 2
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --app-id)
+      [[ $# -ge 2 ]] || die "--app-id requires a value"
+      APP_ID="$2"
+      shift 2
+      ;;
+    --target-dir)
+      [[ $# -ge 2 ]] || die "--target-dir requires a value"
+      TARGET_DIR="$2"
+      shift 2
+      ;;
+    -h|--help)
+      usage
+      exit 0
+      ;;
+    *)
+      die "Unknown option: $1"
+      ;;
+  esac
+done
 
 # Validate kebab-case format
 if [[ ! "$NEW_NAME" =~ ^[a-z][a-z0-9]*(-[a-z0-9]+)*$ ]]; then
   die "Project name must be kebab-case (e.g., my-cool-app). Got: '$NEW_NAME'"
+fi
+
+if [[ -z "$APP_ID" ]]; then
+  die "--app-id is required (e.g., ch.lombold.mycoolapp)"
+fi
+
+if [[ ! "$APP_ID" =~ ^[a-z][a-z0-9_]*(\.[a-z][a-z0-9_]*)+$ ]]; then
+  die "App ID must be a lowercase reverse-DNS identifier (e.g., ch.lombold.mycoolapp). Got: '$APP_ID'"
 fi
 
 # ─── Derive all case variants ───────────────────────────────────────────────
@@ -95,11 +138,14 @@ OLD_KEBAB="project-name"
 OLD_CAMEL="projectName"
 OLD_PASCAL="ProjectName"
 OLD_LOWER="projectname"
+OLD_APP_ID="com.example.projectname"
 
 NEW_KEBAB="$NEW_NAME"
 NEW_CAMEL=$(to_camel "$NEW_NAME")
 NEW_PASCAL=$(to_pascal "$NEW_NAME")
 NEW_LOWER=$(to_lower "$NEW_NAME")
+OLD_APP_PATH=$(tr '.' '/' <<< "$OLD_APP_ID")
+NEW_APP_PATH=$(tr '.' '/' <<< "$APP_ID")
 
 TARGET_DIR="${TARGET_DIR:-$(pwd)/$NEW_KEBAB}"
 
@@ -111,6 +157,7 @@ echo ""
 echo "  Blueprint:     ${BLUEPRINT_REPO}"
 echo "  New repo:      ${GITHUB_OWNER}/${NEW_KEBAB}"
 echo "  Target dir:    ${TARGET_DIR}"
+echo "  App ID:        ${OLD_APP_ID}  →  ${APP_ID}"
 echo ""
 echo "  Case variants:"
 echo "    kebab:       ${OLD_KEBAB}  →  ${NEW_KEBAB}"
@@ -159,6 +206,16 @@ find_text_files() {
     -not -path './backend/target/*' \
     -not -path './frontend/node_modules/*' \
     -not -path './frontend/dist/*' \
+    -not -path './frontend/.angular/*' \
+    -not -path './frontend/coverage/*' \
+    -not -path './app/node_modules/*' \
+    -not -path './app/www/*' \
+    -not -path './app/.angular/*' \
+    -not -path './app/coverage/*' \
+    -not -path './app/android/.gradle/*' \
+    -not -path './app/android/app/build/*' \
+    -not -path './app/android/app/src/main/assets/public/*' \
+    -not -path './app/ios/App/App/public/*' \
     -not -name 'init-project.sh' \
     -type f \
     -exec grep -lI '' {} +
@@ -192,6 +249,7 @@ if [[ -f "README.md" ]]; then
 fi
 
 # Replace content patterns (order: most specific first)
+replace_in_files "$OLD_APP_ID" "$APP_ID"
 replace_in_files "$OLD_CAMEL"  "$NEW_CAMEL"
 replace_in_files "$OLD_PASCAL" "$NEW_PASCAL"
 replace_in_files "$OLD_LOWER"  "$NEW_LOWER"
@@ -204,6 +262,21 @@ success "File contents replaced"
 # Rename directories first (deepest first to avoid path breakage),
 # then rename files.
 #
+
+info "Renaming Android package directories..."
+
+for source_set in main test androidTest; do
+  old_package_dir="app/android/app/src/${source_set}/java/${OLD_APP_PATH}"
+  new_package_dir="app/android/app/src/${source_set}/java/${NEW_APP_PATH}"
+
+  if [[ -d "$old_package_dir" ]]; then
+    mkdir -p "$(dirname "$new_package_dir")"
+    mv "$old_package_dir" "$new_package_dir"
+    echo "    $old_package_dir → $new_package_dir"
+  fi
+done
+
+success "Android package directories renamed"
 
 info "Renaming directories..."
 
@@ -227,14 +300,14 @@ while $renamed; do
       echo "    $dir → $parent/$new_dirname"
       renamed=true
     fi
-  done < <(find . -not -path './.git/*' -not -path './backend/target/*' -not -path './frontend/node_modules/*' -not -path './frontend/dist/*' -type d -depth | grep -E "(${OLD_LOWER}|${OLD_KEBAB}|${OLD_PASCAL}|${OLD_CAMEL})" || true)
+  done < <(find . -not -path './.git/*' -not -path './backend/target/*' -not -path './frontend/node_modules/*' -not -path './frontend/dist/*' -not -path './frontend/.angular/*' -not -path './frontend/coverage/*' -not -path './app/node_modules/*' -not -path './app/www/*' -not -path './app/.angular/*' -not -path './app/coverage/*' -not -path './app/android/.gradle/*' -not -path './app/android/app/build/*' -not -path './app/android/app/src/main/assets/public/*' -not -path './app/ios/App/App/public/*' -type d -depth | grep -E "(${OLD_LOWER}|${OLD_KEBAB}|${OLD_PASCAL}|${OLD_CAMEL})" || true)
 done
 
 success "Directories renamed"
 
 info "Renaming files..."
 
-find . -not -path './.git/*' -not -path './backend/target/*' -not -path './frontend/node_modules/*' -not -path './frontend/dist/*' -type f | while IFS= read -r file; do
+find . -not -path './.git/*' -not -path './backend/target/*' -not -path './frontend/node_modules/*' -not -path './frontend/dist/*' -not -path './frontend/.angular/*' -not -path './frontend/coverage/*' -not -path './app/node_modules/*' -not -path './app/www/*' -not -path './app/.angular/*' -not -path './app/coverage/*' -not -path './app/android/.gradle/*' -not -path './app/android/app/build/*' -not -path './app/android/app/src/main/assets/public/*' -not -path './app/ios/App/App/public/*' -type f | while IFS= read -r file; do
   filename=$(basename "$file")
   parent=$(dirname "$file")
 
@@ -252,7 +325,18 @@ done
 
 success "Files renamed"
 
-# ─── Step 4: Commit the rename ───────────────────────────────────────────────
+# ─── Step 4: Regenerate API clients ─────────────────────────────────────────
+
+info "Regenerating OpenAPI clients for the renamed contract..."
+
+(
+  cd backend
+  mvn spotless:apply generate-sources
+)
+
+success "OpenAPI clients regenerated"
+
+# ─── Step 5: Commit the rename ───────────────────────────────────────────────
 
 info "Committing rename changes..."
 
@@ -267,7 +351,7 @@ All placeholder references updated to ${NEW_KEBAB}."
   success "Rename committed"
 fi
 
-# ─── Step 5: Update git remote ──────────────────────────────────────────────
+# ─── Step 6: Update git remote ──────────────────────────────────────────────
 
 info "Updating git remote..."
 
@@ -275,7 +359,7 @@ git remote set-url origin "git@github.com:${GITHUB_OWNER}/${NEW_KEBAB}.git"
 
 success "Remote set to ${GITHUB_OWNER}/${NEW_KEBAB}"
 
-# ─── Step 6: Create GitHub repo and push ─────────────────────────────────────
+# ─── Step 7: Create GitHub repo and push ─────────────────────────────────────
 
 info "Creating GitHub repository..."
 
@@ -302,6 +386,8 @@ echo "  Next steps:"
 echo "    cd ${TARGET_DIR}"
 echo "    # Backend:  cd backend && mvn spring-boot:run"
 echo "    # Frontend: cd frontend && bun install && bun run start"
+echo "    # App:      cd app && bun install && bun run start"
+echo "    # Native:   cd app && bun run sync"
 echo ""
 echo "  Remember to set up the blueprint sync variable (optional):"
 echo "    gh variable set BLUEPRINT_REPO --body '${BLUEPRINT_REPO}' --repo ${GITHUB_OWNER}/${NEW_KEBAB}"

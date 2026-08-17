@@ -1,0 +1,13 @@
+.state {
+  display: grid;
+  min-height: 60vh;
+  padding: 2rem;
+  place-items: center;
+  align-content: center;
+  text-align: center;
+}
+
+.state h2,
+.state p {
+  margin-block: 0 0.75rem;
+}

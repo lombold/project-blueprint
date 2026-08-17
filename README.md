@@ -3,9 +3,12 @@
 {{TBD: Short project description}}
 
 ## Tech Stack
-- Backend: Java 25, Spring Boot 4.0, Spring Data JPA, H2, Flyway, MapStruct, ArchUnit, Maven
-- Frontend: Angular 21, TypeScript 5.9, Tailwind CSS 4.1, RxJS 7.8, Vitest 4, Playwright 1.58, Bun 1.1.30
-- Tooling: Docker, GitHub Actions
+
+- Backend: Java 25, Spring Boot 4, Spring Data JPA, H2, Flyway, MapStruct, ArchUnit, Maven
+- Web: Angular 21, Tailwind CSS 4, Vitest, Playwright, Bun
+- App: Ionic 8, Angular 21, Capacitor 8, native Android and iOS projects, Bun
+- Contract: one OpenAPI specification generates the backend API and both Angular clients
+- Tooling: Docker and GitHub Actions
 
 ## Project Structure
 ```
@@ -35,21 +38,21 @@
 ├── frontend/                         # Angular application
 │   ├── src/
 │   │   ├── app/
-│   │   │   ├── pages/                # Page components
-│   │   │   │   ├── dashboard/
-│   │   │   │   ├── users/
-│   │   │   │   └── workouts/
-│   │   │   ├── ui/                   # Reusable UI components
-│   │   │   ├── services/             # HTTP & business logic
-│   │   │   ├── models/               # TypeScript interfaces
-│   │   │   ├── state/                # Signals state management
+│   │   │   ├── core/api/             # Generated OpenAPI client
+│   │   │   ├── pages/                # Route-level page components
+│   │   │   ├── shared/               # Cross-feature UI and utilities
 │   │   │   └── app.routes.ts         # Routing config
-│   │   ├── main.ts                   # Entry point
-│   │   └── index.html
 │   ├── e2e/                          # Playwright E2E tests
-│   ├── vitest.config.ts              # Test configuration
-│   ├── tailwind.config.js            # Tailwind config
-│   ├── eslint.config.js              # ESLint config
+│   └── package.json
+│
+├── app/                              # Ionic Angular application
+│   ├── src/app/
+│   │   ├── core/api/                 # Generated OpenAPI client
+│   │   ├── pages/users/              # Starter route and API example
+│   │   └── shared/                   # Cross-feature UI and utilities
+│   ├── android/                      # Capacitor Android project
+│   ├── ios/                          # Capacitor iOS project
+│   ├── capacitor.config.ts
 │   └── package.json
 │
 ├── .github/workflows/                # CI/CD pipelines
@@ -57,7 +60,7 @@
 │   ├── docker.yml                    # Docker build & push
 │   └── e2e.yml                       # E2E tests
 │
-├── Dockerfile                        # Multi-stage build
+├── Dockerfile                        # Multi-stage web build
 ├── .dockerignore                     # Ignored files for docker build
 ├── docker-compose.yml                # Local dev setup (optional)
 └── README.md
@@ -65,10 +68,12 @@
 
 ## Commands
 Backend (run from `backend/`):
+
 - start: `mvn spring-boot:run`
 - start with local snapshot: `mvn spring-boot:run -Dspring-boot.run.profiles=local`
 - test: `mvn test`
-- lint: not configured
+- full verification: `mvn clean verify`
+- regenerate API contracts: `mvn generate-sources`
 
 ## Database Migrations
 
@@ -94,28 +99,63 @@ Recommended workflow:
 4. Add the equivalent forward-only SQL to the generated file in `incremental/`.
 5. Run `cd backend && mvn test`.
 
-Frontend (run from `frontend/`):
+Web frontend (run from `frontend/`):
+
 - install: `bun install`
 - start: `bun run start`
 - build: `bun run build`
-- test: `bun run test`
-- lint: `bunx eslint .`
-- e2e: `bunx playwright test`
+- test: `bun run test -- --watch=false`
+- lint: `bun run lint`
+- architecture: `bun run depcruise`
+- e2e: `bun run e2e`
+
+Ionic app (run from `app/`):
+
+- install: `bun install`
+- browser development: `bun run start` (port 4200)
+- build: `bun run build`
+- test: `bun run test -- --watch=false`
+- lint: `bun run lint`
+- architecture: `bun run depcruise`
+- copy the web build and native dependencies: `bun run sync`
+- open Android Studio: `bun run android`
+- open Xcode: `bun run ios`
+
+Set the production API URL in `app/src/environments/environment.prod.ts` before shipping. The
+development configuration calls `http://localhost:8080`; Android emulators normally reach the host
+machine at `http://10.0.2.2:8080`, so adjust the development environment when testing there.
+Override `app.cors.allowed-origins` in deployed backend configuration so it contains only the
+deployed browser origins plus the Capacitor origins used by the native apps.
+
+The generated native projects include placeholder icons and splash screens. Replace them before a
+release; Capacitor's asset generator can regenerate both platforms with
+`bunx @capacitor/assets generate` after source artwork is placed under `app/resources/`.
+
+The Angular CLI persistent disk cache is disabled for the app because the current Angular 21 and
+Ionic build combination can deadlock in the esbuild service. It can be re-enabled after upgrading
+the toolchain and confirming repeatable builds.
 
 ## Creating a New Project from This Blueprint
 
 Instead of GitHub's "Use this template" (which strips git history), use the init script to clone with full history and rename everything in one step:
 
 ```bash
-./init-project.sh <kebab-case-name> <github-owner> [target-dir]
+./init-project.sh <kebab-case-name> <github-owner> --app-id <reverse-dns-id> [--target-dir <path>]
 
 # Example:
-./init-project.sh my-cool-app lombold
+./init-project.sh my-cool-app lombold \
+  --app-id ch.lombold.mycoolapp \
+  --target-dir ../my-cool-app
 ```
 
-The script derives all case variants from the kebab-case name (`myCoolApp`, `MyCoolApp`, `mycoolapp`, `my-cool-app`), replaces them across all files, renames directories and files (including the Java package), creates a private GitHub repo, and pushes.
+The script derives all project-name variants, replaces the Capacitor/Android/iOS app identifier,
+renames files and directories (including Java and Android packages), creates a private GitHub
+repository, and pushes it.
 
-Prerequisites: `git`, `gh`.
+Prerequisites: `git`, authenticated `gh`, Java 25, and Maven.
+
+For native development, also install Android Studio with an Android SDK. Building iOS requires
+macOS and Xcode.
 
 ## Blueprint Sync
 

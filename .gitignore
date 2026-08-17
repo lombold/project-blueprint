@@ -34,8 +34,10 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 bun.lock
+!app/bun.lock
 package-lock.json
 yarn.lock
+!app/android/gradle/wrapper/gradle-wrapper.jar
 
 # Playwright
 frontend/playwright-report/

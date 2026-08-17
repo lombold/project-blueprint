@@ -1,6 +1,6 @@
 # Angular/Ionic/Capacitor App Template Proposal
 
-- Status: Proposed
+- Status: Implemented
 - Target: Project Blueprint
 - Scope: Add an installable iOS and Android client alongside the existing web client
 
@@ -57,7 +57,7 @@ project-blueprint/
 │   ├── capacitor.config.ts
 │   ├── ionic.config.json
 │   ├── package.json
-│   └── bun.lockb
+│   └── bun.lock
 ├── docs/proposals/
 └── ...
 ```
@@ -92,8 +92,8 @@ The app will use:
 - Ionic components for app UI; Tailwind is not required in the first increment.
 - Bun for dependency installation and JavaScript scripts.
 
-The exact compatible dependency versions will be resolved and locked when the scaffold is created.
-Angular remains on the same major and minor line as `frontend/`.
+The generated project is upgraded with Angular CLI update commands when the Ionic starter lags the
+web client. The checked-in lockfile is authoritative for exact compatible versions.
 
 ### Command-driven scaffolding and initialization
 
@@ -106,7 +106,12 @@ bunx @ionic/cli start --list
 bunx @ionic/cli start --help
 
 # Generate a standalone Angular app and initialize its Capacitor integration.
-bunx @ionic/cli start app blank --type=angular --capacitor --no-deps --no-git
+bunx @ionic/cli@7.2.1 start app blank \
+  --type=angular-standalone \
+  --capacitor \
+  --package-id=com.example.projectname \
+  --no-deps \
+  --no-git
 
 cd app
 bun install
@@ -282,7 +287,7 @@ The app will expose commands consistent with the existing frontend:
 ```bash
 cd app
 bun install
-bun run start              # browser development on :8100
+bun run start              # browser development on :4200
 bun run build              # production web bundle in www/
 bun run test -- --watch=false
 bun run test:ci

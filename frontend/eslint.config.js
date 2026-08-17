@@ -31,7 +31,7 @@ module.exports = defineConfig([
           style: "kebab-case",
         },
       ],
-      '@angular-eslint/no-output-native': false,
+      '@angular-eslint/no-output-native': 'off',
     },
   },
   {
