@@ -35,9 +35,10 @@ bun run test -- --watch=false                # Vitest unit tests
 bun run test:ci                              # tests with V8 coverage
 bun run lint                                 # lint
 bun run depcruise                            # boundary checks
-bun run sync                                 # build and sync both native projects
-bun run android                              # open the Android project
-bun run ios                                  # open the iOS project
+bun run sync                                 # development build and sync both native projects
+bun run sync:prod                            # production build and sync both native projects
+bun run android                              # development sync and open the Android project
+bun run ios                                  # development sync and open the iOS project
 ```
 
 ### Docker

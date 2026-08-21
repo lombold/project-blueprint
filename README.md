@@ -156,13 +156,17 @@ Ionic app (run from `app/`):
 - test: `bun run test -- --watch=false`
 - lint: `bun run lint`
 - architecture: `bun run depcruise`
-- copy the web build and native dependencies: `bun run sync`
-- open Android Studio: `bun run android`
-- open Xcode: `bun run ios`
+- development build and native sync: `bun run sync`
+- production build and native sync: `bun run sync:prod`
+- development sync and open Android Studio: `bun run android`
+- development sync and open Xcode: `bun run ios`
 
 Set the production API URL in `app/src/environments/environment.prod.ts` before shipping. The
-development configuration calls `http://localhost:8080`; Android emulators normally reach the host
-machine at `http://10.0.2.2:8080`, so adjust the development environment when testing there.
+native development commands use `environment.development.ts`, including its local API and OIDC
+endpoints. The development API configuration calls `http://localhost:8080`. A physical iOS device
+needs the Mac's reachable LAN hostname or IP instead of `localhost`; Android emulators normally
+reach the host machine at `http://10.0.2.2:8080`. Adjust the development environment for those
+targets.
 Override `app.cors.allowed-origins` in deployed backend configuration so it contains only the
 deployed browser origins plus the Capacitor origins used by the native apps.
 

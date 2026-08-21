@@ -112,7 +112,7 @@ jobs:
 
       - name: Build and sync native projects
         working-directory: ./app
-        run: bun run sync
+        run: bun run sync:prod
 
       - name: Verify Capacitor web entry point
         run: test -f app/www/index.html
