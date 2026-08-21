@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject, type OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { AuthService } from '@core/services/auth.service';
 import { IonButton, IonContent, IonHeader, IonTitle, IonToolbar } from '@ionic/angular/standalone';
 
@@ -15,9 +15,7 @@ import { IonButton, IonContent, IonHeader, IonTitle, IonToolbar } from '@ionic/a
         <p class="eyebrow">ProjectName</p>
         <h1>Sign in</h1>
         <p>Use your ProjectName account to continue.</p>
-        <ion-button expand="block" size="large" (click)="login()">
-          Sign in with Keycloak
-        </ion-button>
+        <ion-button expand="block" size="large" (click)="login()">Continue to sign in</ion-button>
       </section>
     </ion-content>
   `,
@@ -42,12 +40,8 @@ import { IonButton, IonContent, IonHeader, IonTitle, IonToolbar } from '@ionic/a
   imports: [IonButton, IonContent, IonHeader, IonTitle, IonToolbar],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class LoginPage implements OnInit {
+export class LoginPage {
   private readonly authService = inject(AuthService);
-
-  ngOnInit(): void {
-    void this.authService.login();
-  }
 
   protected login(): void {
     void this.authService.login();

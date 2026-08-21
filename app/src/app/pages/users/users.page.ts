@@ -10,6 +10,7 @@ import {
   IonItem,
   IonLabel,
   IonList,
+  IonPopover,
   IonSpinner,
   IonTitle,
   IonToolbar,
@@ -27,6 +28,7 @@ import {
     IonItem,
     IonLabel,
     IonList,
+    IonPopover,
     IonSpinner,
     IonTitle,
     IonToolbar,
@@ -42,14 +44,21 @@ export class UsersPage {
   });
   protected readonly hasUsers = computed(() => (this.users.value()?.length ?? 0) > 0);
   protected readonly accountMenuOpen = signal(false);
+  protected readonly accountMenuEvent = signal<Event | undefined>(undefined);
   protected readonly displayName = this.authService.displayName;
 
   protected retry(): void {
     this.users.reload();
   }
 
-  protected toggleAccountMenu(): void {
-    this.accountMenuOpen.update((open) => !open);
+  protected openAccountMenu(event: Event): void {
+    this.accountMenuEvent.set(event);
+    this.accountMenuOpen.set(true);
+  }
+
+  protected closeAccountMenu(): void {
+    this.accountMenuOpen.set(false);
+    this.accountMenuEvent.set(undefined);
   }
 
   protected logout(): void {

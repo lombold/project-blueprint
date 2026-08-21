@@ -3,24 +3,49 @@
     <ion-title>Users</ion-title>
     <ion-buttons slot="end">
       <ion-button
+        id="account-menu-button"
         data-testid="account-menu-button"
         [attr.aria-expanded]="accountMenuOpen()"
         aria-haspopup="menu"
-        (click)="toggleAccountMenu()"
+        (click)="openAccountMenu($event)"
       >
         {{ displayName() }}
       </ion-button>
     </ion-buttons>
-    @if (accountMenuOpen()) {
-      <div class="account-menu" role="menu">
-        <p>{{ displayName() }}</p>
-        <button type="button" data-testid="logout-button" role="menuitem" (click)="logout()">
-          Log out
-        </button>
-      </div>
-    }
   </ion-toolbar>
 </ion-header>
+
+<ion-popover
+  data-testid="account-menu-dropdown"
+  [isOpen]="accountMenuOpen()"
+  [event]="accountMenuEvent()"
+  side="bottom"
+  alignment="end"
+  [dismissOnSelect]="true"
+  (didDismiss)="closeAccountMenu()"
+>
+  <ng-template>
+    <ion-content>
+      <ion-list lines="none" role="menu">
+        <ion-item>
+          <ion-label>
+            <h2>{{ displayName() }}</h2>
+            <p>Signed in</p>
+          </ion-label>
+        </ion-item>
+        <ion-item
+          button="true"
+          detail="false"
+          data-testid="logout-button"
+          role="menuitem"
+          (click)="logout()"
+        >
+          <ion-label color="danger">Log out</ion-label>
+        </ion-item>
+      </ion-list>
+    </ion-content>
+  </ng-template>
+</ion-popover>
 
 <ion-content [fullscreen]="true">
   <ion-header collapse="condense">

@@ -6,7 +6,7 @@ import { App as CapacitorApp } from '@capacitor/app';
 import { Browser } from '@capacitor/browser';
 import { Capacitor } from '@capacitor/core';
 import { firstValueFrom } from 'rxjs';
-import { environment } from '../../../environments/environment';
+import { OIDC_CONFIG } from './oidc.config';
 
 const oidcStateKey = 'oidc_state';
 const oidcCodeVerifierKey = 'oidc_code_verifier';
@@ -16,6 +16,7 @@ const oidcResponseParams = ['code', 'state', 'session_state', 'iss', 'error', 'e
 export class AuthService {
   private readonly document = inject(DOCUMENT);
   private readonly http = inject(HttpClient);
+  private readonly oidcConfig = inject(OIDC_CONFIG);
   private readonly router = inject(Router);
   private readonly profile = signal<UserProfile | undefined>(this.readStoredProfile());
   private nativeListenerRegistered = false;
@@ -56,11 +57,15 @@ export class AuthService {
   }
 
   async logout(): Promise<void> {
+    const idToken =
+      this.view()?.localStorage.getItem('id_token') ??
+      this.view()?.sessionStorage.getItem('id_token') ??
+      undefined;
     this.clearStoredSession();
     const redirectUri = Capacitor.isNativePlatform()
-      ? environment.oidcRedirectUri
+      ? this.oidcConfig.nativeRedirectUri
       : new URL('login', this.document.baseURI).toString();
-    const url = this.logoutUrl(redirectUri);
+    const url = this.logoutUrl(redirectUri, idToken);
     if (Capacitor.isNativePlatform()) {
       await Browser.open({ url });
       return;
@@ -69,8 +74,8 @@ export class AuthService {
   }
 
   loginUrl(redirectUri: string, options: LoginOptions = {}): string {
-    const url = new URL(`${environment.oidcIssuer}/protocol/openid-connect/auth`);
-    url.searchParams.set('client_id', environment.oidcClientId);
+    const url = new URL(this.oidcConfig.authorizationEndpoint);
+    url.searchParams.set('client_id', this.oidcConfig.clientId);
     url.searchParams.set('redirect_uri', redirectUri);
     url.searchParams.set('response_type', 'code');
     url.searchParams.set('scope', 'openid profile email');
@@ -84,10 +89,13 @@ export class AuthService {
     return url.toString();
   }
 
-  logoutUrl(redirectUri: string): string {
-    const url = new URL(`${environment.oidcIssuer}/protocol/openid-connect/logout`);
-    url.searchParams.set('client_id', environment.oidcClientId);
+  logoutUrl(redirectUri: string, idToken?: string): string {
+    const url = new URL(this.oidcConfig.endSessionEndpoint);
+    url.searchParams.set('client_id', this.oidcConfig.clientId);
     url.searchParams.set('post_logout_redirect_uri', redirectUri);
+    if (idToken) {
+      url.searchParams.set('id_token_hint', idToken);
+    }
     return url.toString();
   }
 
@@ -121,10 +129,10 @@ export class AuthService {
     }
 
     const redirectUri = Capacitor.isNativePlatform()
-      ? environment.oidcRedirectUri
+      ? this.oidcConfig.nativeRedirectUri
       : new URL(currentUrl.pathname, currentUrl.origin).toString();
     const body = new URLSearchParams({
-      client_id: environment.oidcClientId,
+      client_id: this.oidcConfig.clientId,
       code,
       code_verifier: codeVerifier,
       grant_type: 'authorization_code',
@@ -132,7 +140,7 @@ export class AuthService {
     }).toString();
     const response = await firstValueFrom(
       this.http.post<TokenResponse>(
-        `${environment.oidcIssuer}/protocol/openid-connect/token`,
+        this.oidcConfig.tokenEndpoint,
         body,
         { headers: new HttpHeaders({ 'Content-Type': 'application/x-www-form-urlencoded' }) },
       ),
@@ -155,7 +163,7 @@ export class AuthService {
 
   private redirectUri(): string {
     return Capacitor.isNativePlatform()
-      ? environment.oidcRedirectUri
+      ? this.oidcConfig.nativeRedirectUri
       : new URL('users', this.document.baseURI).toString();
   }
 
@@ -176,6 +184,8 @@ export class AuthService {
       this.view()?.localStorage.removeItem(key);
       this.view()?.sessionStorage.removeItem(key);
     }
+    this.view()?.sessionStorage.removeItem(oidcStateKey);
+    this.view()?.sessionStorage.removeItem(oidcCodeVerifierKey);
     this.profile.set(undefined);
   }
 

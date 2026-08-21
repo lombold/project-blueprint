@@ -15,6 +15,7 @@ import {
 import { Configuration } from '@core/api';
 import { authSessionInterceptor } from '@core/services/auth-session.interceptor';
 import { AuthService } from '@core/services/auth.service';
+import { OIDC_CONFIG } from '@core/services/oidc.config';
 import { IonicRouteStrategy, provideIonicAngular } from '@ionic/angular/standalone';
 import { environment } from '../environments/environment';
 import { routes } from './app.routes';
@@ -35,6 +36,7 @@ export const appConfig: ApplicationConfig = {
     provideIonicAngular(),
     provideRouter(routes, withPreloading(PreloadAllModules)),
     provideHttpClient(withInterceptors([authSessionInterceptor])),
+    { provide: OIDC_CONFIG, useValue: environment.oidc },
     {
       provide: Configuration,
       useFactory: apiConfigurationFactory,

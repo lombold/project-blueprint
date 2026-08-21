@@ -1,7 +1,11 @@
 export const environment = {
   apiBaseUrl: 'https://api.example.com',
-  oidcIssuer: 'https://auth.example.com/realms/project-name',
-  oidcClientId: 'project-name-app',
-  oidcRedirectUri: 'com.example.projectname://auth/callback',
+  oidc: {
+    authorizationEndpoint: 'https://identity.example.com/oauth2/authorize',
+    clientId: 'project-name-app',
+    endSessionEndpoint: 'https://identity.example.com/oauth2/logout',
+    nativeRedirectUri: 'com.example.projectname://auth/callback',
+    tokenEndpoint: 'https://identity.example.com/oauth2/token',
+  },
   production: true,
 };

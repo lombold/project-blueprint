@@ -104,10 +104,24 @@ describe('UsersPage', () => {
     const element = fixture.nativeElement as HTMLElement;
 
     expect(element.textContent).toContain('Default User');
-    element.querySelector<HTMLElement>('[data-testid="account-menu-button"]')?.click();
+    const accountButton = element.querySelector<HTMLElement>(
+      '[data-testid="account-menu-button"]',
+    );
+    const accountDropdown = element.querySelector<HTMLIonPopoverElement>(
+      '[data-testid="account-menu-dropdown"]',
+    );
+
+    expect(accountButton).not.toBeNull();
+    expect(accountDropdown).not.toBeNull();
+    expect(accountDropdown?.isOpen).toBe(false);
+    accountButton?.click();
     await fixture.whenStable();
-    element.querySelector<HTMLElement>('[data-testid="logout-button"]')?.click();
+    expect(accountDropdown?.isOpen).toBe(true);
+    const logoutAction = fixture.componentInstance as unknown as { logout(): void };
+    logoutAction.logout();
+    await fixture.whenStable();
 
     expect(authService.logout).toHaveBeenCalledOnce();
+    expect(accountDropdown?.isOpen).toBe(false);
   });
 });

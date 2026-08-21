@@ -8,7 +8,7 @@
 - Web: Angular 21, Tailwind CSS 4, Vitest, Playwright, Bun
 - App: Ionic 8, Angular 21, Capacitor 8, native Android and iOS projects, Bun
 - Contract: one OpenAPI specification generates the backend API and both Angular clients
-- Authentication: Keycloak OIDC authorization code flow with PKCE
+- Authentication: OpenID Connect authorization code flow with PKCE
 - Tooling: Spring Boot Docker Compose, Docker, and GitHub Actions
 
 ## Project Structure
@@ -103,14 +103,16 @@ environment. All `/api/**` endpoints require a bearer token except `/api/health`
 `/actuator/health`.
 
 Both Angular clients use the authorization-code flow with PKCE. The web frontend exchanges the
-callback on its `/users` route. The native app opens Keycloak in the system browser and returns
-through `com.example.projectname://auth/callback`; the Android intent filter and iOS URL scheme are
-already configured. The project initializer replaces that placeholder scheme when a real app ID is
-selected.
+callback on its `/users` route. The native app opens the configured identity provider in the system
+browser and returns through `com.example.projectname://auth/callback`; the Android intent filter and
+iOS URL scheme are already configured. The project initializer replaces that placeholder scheme
+when a real app ID is selected.
 
-For an Android emulator or physical device, replace the app's local `oidcIssuer` with an address
-that can reach the host running Keycloak, and set the backend's `OIDC_ISSUER_URI` to the same issuer.
-Set the deployed API and issuer URLs in `app/src/environments/environment.prod.ts` before shipping.
+The app does not assume a provider-specific endpoint layout. Configure `authorizationEndpoint`,
+`tokenEndpoint`, `endSessionEndpoint`, `clientId`, and `nativeRedirectUri` under `environment.oidc`
+in the app environment files. For an Android emulator or physical device, use endpoint addresses
+that can reach the configured identity provider. Set the deployed API and OIDC values in
+`app/src/environments/environment.prod.ts` before shipping.
 
 ## Database Migrations
 
