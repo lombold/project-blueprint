@@ -1,6 +1,24 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
     <ion-title>Users</ion-title>
+    <ion-buttons slot="end">
+      <ion-button
+        data-testid="account-menu-button"
+        [attr.aria-expanded]="accountMenuOpen()"
+        aria-haspopup="menu"
+        (click)="toggleAccountMenu()"
+      >
+        {{ displayName() }}
+      </ion-button>
+    </ion-buttons>
+    @if (accountMenuOpen()) {
+      <div class="account-menu" role="menu">
+        <p>{{ displayName() }}</p>
+        <button type="button" data-testid="logout-button" role="menuitem" (click)="logout()">
+          Log out
+        </button>
+      </div>
+    }
   </ion-toolbar>
 </ion-header>
 
@@ -20,7 +38,7 @@
     <section class="state" aria-live="polite">
       <h2>Could not load users.</h2>
       <p>Check the API connection and try again.</p>
-      <ion-button (click)="retry()">Try again</ion-button>
+      <ion-button data-testid="retry-button" (click)="retry()">Try again</ion-button>
     </section>
   } @else if (hasUsers()) {
     <ion-list inset="true">

@@ -5,6 +5,8 @@ info:
   description: API-first specification for the ProjectName application.
 servers:
   - url: /
+security:
+  - bearerAuth: []
 paths:
   /api/users:
     get:
@@ -105,6 +107,7 @@ paths:
       tags: [Health]
       operationId: getHealth
       summary: Health check
+      security: []
       responses:
         "200":
           description: Health status
@@ -113,6 +116,11 @@ paths:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
 components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
   schemas:
     User:
       type: object
@@ -194,4 +202,3 @@ components:
       required:
         - message
         - field
-

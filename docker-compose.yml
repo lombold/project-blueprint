@@ -1,56 +1,23 @@
-version: '3.8'
-
 services:
-  # Spring Boot Backend
-  backend:
-    build:
-      context: .
-      dockerfile: Dockerfile
+  keycloak:
+    image: quay.io/keycloak/keycloak:26.1
+    command: start-dev --import-realm --hostname-strict=false --hostname-backchannel-dynamic=false
     ports:
-      - "8080:8080"
+      - "8082:8080"
     environment:
-      - JAVA_OPTS=-Xmx512m -Xms256m
-      - SPRING_PROFILES_ACTIVE=local
-    healthcheck:
-      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8080/actuator/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 40s
+      - KC_BOOTSTRAP_ADMIN_USERNAME=admin
+      - KC_BOOTSTRAP_ADMIN_PASSWORD=admin
     volumes:
-      - ./backend/target:/app/backend/target
+      - ./keycloak/project-name-realm.json:/opt/keycloak/data/import/project-name-realm.json:ro
     networks:
       - project-name-network
-
-  # Frontend (for development, run separately with `bun run start`)
-  # This is commented out because the frontend is typically run with `bun run start`
-  # during development, but you can uncomment and modify if you want Docker-based frontend
-  # frontend:
-  #   build:
-  #     context: ./frontend
-  #     dockerfile: Dockerfile
-  #   ports:
-  #     - "4200:4200"
-  #   environment:
-  #     - NODE_ENV=development
-  #   volumes:
-  #     - ./frontend/src:/app/src
-  #   networks:
-  #     - project-name-network
-  #   depends_on:
-  #     - backend
 
 networks:
   project-name-network:
     driver: bridge
 
 # Usage:
-# Development:
-#   1. Start backend: docker-compose up -d backend
-#   2. In another terminal: cd frontend && bun run start
-#
-# Full stack:
-#   docker-compose up
-#
-# Stop:
-#   docker-compose down
+# - Run the backend from backend/ with:
+#     mvn spring-boot:run -Dspring-boot.run.profiles=local
+# - Spring Boot Docker Compose starts Keycloak automatically.
+# - Run the web frontend and Ionic app separately with `bun run start`.

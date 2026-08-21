@@ -34,7 +34,7 @@ public class SecurityConfig {
             + "style-src 'self' 'unsafe-inline'; "
             + "img-src 'self' data:; "
             + "font-src 'self'; "
-            + "connect-src 'self'; "
+            + "connect-src 'self' http://localhost:8082; "
             + "object-src 'none'; "
             + "frame-ancestors 'self'; "
             + "base-uri 'self'; "
@@ -62,7 +62,15 @@ public class SecurityConfig {
                         .frameOptions(HeadersConfigurer.FrameOptionsConfig::sameOrigin)
                         .referrerPolicy(referrer -> referrer.policy(
                                 ReferrerPolicyHeaderWriter.ReferrerPolicy.STRICT_ORIGIN_WHEN_CROSS_ORIGIN)))
-                .authorizeHttpRequests(auth -> auth.anyRequest().permitAll())
+                .authorizeHttpRequests(auth -> auth.requestMatchers("/", "/ui/**", "/assets/**", "/favicon.ico")
+                        .permitAll()
+                        .requestMatchers("/actuator/health", "/api/health")
+                        .permitAll()
+                        .requestMatchers("/api/**")
+                        .authenticated()
+                        .anyRequest()
+                        .permitAll())
+                .oauth2ResourceServer(oauth2 -> oauth2.jwt(Customizer.withDefaults()))
                 .build();
     }
 

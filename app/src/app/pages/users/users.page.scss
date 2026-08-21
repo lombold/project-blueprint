@@ -11,3 +11,31 @@
 .state p {
   margin-block: 0 0.75rem;
 }
+
+.account-menu {
+  position: absolute;
+  z-index: 10;
+  top: 3.25rem;
+  right: 0.75rem;
+  min-width: 12rem;
+  padding: 0.75rem;
+  border: 1px solid var(--ion-color-light-shade);
+  border-radius: 0.5rem;
+  background: var(--ion-background-color);
+  box-shadow: 0 0.5rem 1.5rem rgb(0 0 0 / 18%);
+}
+
+.account-menu p {
+  margin: 0 0 0.5rem;
+  font-weight: 600;
+}
+
+.account-menu button {
+  width: 100%;
+  padding: 0.5rem;
+  border: 0;
+  border-radius: 0.25rem;
+  background: transparent;
+  color: var(--ion-color-danger);
+  text-align: left;
+}

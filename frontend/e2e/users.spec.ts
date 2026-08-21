@@ -1,9 +1,9 @@
 import { test, expect } from '@playwright/test';
+import { login } from './auth';
 
 test.describe('Users Page E2E Tests', () => {
   test.beforeEach(async ({ page }) => {
-    // Navigate to Users page
-    await page.goto('/ui/users');
+    await login(page);
     await page.waitForLoadState('networkidle');
   });
 
@@ -45,7 +45,7 @@ test.describe('Users Page E2E Tests', () => {
 
   test('should create a new user', async ({ page }) => {
     // Mock the API response
-    await page.route('**/api/v1/users', route => {
+    await page.route('**/api/v1/users', (route) => {
       if (route.request().method() === 'POST') {
         route.abort('failed');
       } else {

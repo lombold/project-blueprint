@@ -1,5 +1,6 @@
 import { Routes } from '@angular/router';
 import { UsersPage } from '@pages/users/users.page';
+import { LoginPage } from '@pages/login/login.page';
 
 export interface RouteData {
   title?: string;
@@ -9,14 +10,21 @@ export interface RouteData {
 export const routes: Routes = [
   {
     path: '',
-    redirectTo: '/users',
-    pathMatch: 'full'
+    redirectTo: '/login',
+    pathMatch: 'full',
+  },
+  {
+    path: 'login',
+    component: LoginPage,
+    data: {
+      title: 'Sign in',
+    },
   },
   {
     path: 'users',
     component: UsersPage,
     data: {
       title: 'Users',
-    }
+    },
   },
 ];

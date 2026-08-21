@@ -5,9 +5,19 @@ spring:
       path: /h2-console
       settings:
         web-allow-others: false
+  docker:
+    compose:
+      enabled: true
+      file: ./docker-compose.yml
+      lifecycle-management: start_only
+      start:
+        command: up
+      stop:
+        command: down
 
 logging:
   level:
     com.projectname: DEBUG
     org.springframework.web: DEBUG
     org.springframework.boot.web.servlet.error: DEBUG
+

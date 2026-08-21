@@ -8,7 +8,8 @@
 - Web: Angular 21, Tailwind CSS 4, Vitest, Playwright, Bun
 - App: Ionic 8, Angular 21, Capacitor 8, native Android and iOS projects, Bun
 - Contract: one OpenAPI specification generates the backend API and both Angular clients
-- Tooling: Docker and GitHub Actions
+- Authentication: Keycloak OIDC authorization code flow with PKCE
+- Tooling: Spring Boot Docker Compose, Docker, and GitHub Actions
 
 ## Project Structure
 ```
@@ -55,6 +56,9 @@
 │   ├── capacitor.config.ts
 │   └── package.json
 │
+├── keycloak/                         # Importable local OIDC realm and default users
+│   └── project-name-realm.json
+│
 ├── .github/workflows/                # CI/CD pipelines
 │   ├── test.yml                      # Backend & frontend tests
 │   ├── docker.yml                    # Docker build & push
@@ -62,7 +66,7 @@
 │
 ├── Dockerfile                        # Multi-stage web build
 ├── .dockerignore                     # Ignored files for docker build
-├── docker-compose.yml                # Local dev setup (optional)
+├── docker-compose.yml                # Keycloak started by Spring Boot for local development
 └── README.md
 ```
 
@@ -74,6 +78,39 @@ Backend (run from `backend/`):
 - test: `mvn test`
 - full verification: `mvn clean verify`
 - regenerate API contracts: `mvn generate-sources`
+
+## Local Authentication
+
+Local development uses the Keycloak realm in `keycloak/project-name-realm.json`. Start the backend
+with the `local` profile; Spring Boot Docker Compose starts Keycloak automatically:
+
+```bash
+cd backend
+mvn spring-boot:run -Dspring-boot.run.profiles=local
+```
+
+- Keycloak admin console: `http://localhost:8082`
+- Keycloak bootstrap admin: `keycloak` / `keycloak`
+- Realm: `project-name`
+- Default application user: `user` / `user` with realm role `USER`
+- Application admin: `admin` / `admin` with realm roles `ADMIN`, `USER`
+- Web client: `project-name-frontend`
+- Native app client: `project-name-app`
+
+Spring Security validates JWTs against
+`http://localhost:8082/realms/project-name` by default. Override `OIDC_ISSUER_URI` for another
+environment. All `/api/**` endpoints require a bearer token except `/api/health` and
+`/actuator/health`.
+
+Both Angular clients use the authorization-code flow with PKCE. The web frontend exchanges the
+callback on its `/users` route. The native app opens Keycloak in the system browser and returns
+through `com.example.projectname://auth/callback`; the Android intent filter and iOS URL scheme are
+already configured. The project initializer replaces that placeholder scheme when a real app ID is
+selected.
+
+For an Android emulator or physical device, replace the app's local `oidcIssuer` with an address
+that can reach the host running Keycloak, and set the backend's `OIDC_ISSUER_URI` to the same issuer.
+Set the deployed API and issuer URLs in `app/src/environments/environment.prod.ts` before shipping.
 
 ## Database Migrations
 

@@ -1,0 +1,77 @@
+{
+  "realm": "project-name",
+  "enabled": true,
+  "roles": {
+    "realm": [
+      { "name": "ADMIN", "description": "Application administrator" },
+      { "name": "USER", "description": "Authenticated application user" }
+    ]
+  },
+  "clients": [
+    {
+      "clientId": "project-name-frontend",
+      "name": "ProjectName Frontend",
+      "enabled": true,
+      "publicClient": true,
+      "protocol": "openid-connect",
+      "standardFlowEnabled": true,
+      "directAccessGrantsEnabled": false,
+      "redirectUris": [
+        "http://localhost:4200/*",
+        "http://localhost:4201/*",
+        "http://localhost:8080/ui/*"
+      ],
+      "webOrigins": [
+        "http://localhost:4200",
+        "http://localhost:4201",
+        "http://localhost:8080"
+      ],
+      "attributes": { "pkce.code.challenge.method": "S256" }
+    },
+    {
+      "clientId": "project-name-app",
+      "name": "ProjectName App",
+      "enabled": true,
+      "publicClient": true,
+      "protocol": "openid-connect",
+      "standardFlowEnabled": true,
+      "directAccessGrantsEnabled": false,
+      "redirectUris": [
+        "com.example.projectname://auth/callback",
+        "http://localhost:4200/*",
+        "capacitor://localhost/*",
+        "https://localhost/*"
+      ],
+      "webOrigins": [
+        "http://localhost:4200",
+        "capacitor://localhost",
+        "https://localhost"
+      ],
+      "attributes": { "pkce.code.challenge.method": "S256" }
+    }
+  ],
+  "users": [
+    {
+      "username": "admin",
+      "enabled": true,
+      "email": "admin@example.test",
+      "firstName": "Admin",
+      "lastName": "User",
+      "credentials": [
+        { "type": "password", "value": "admin", "temporary": false }
+      ],
+      "realmRoles": ["ADMIN", "USER"]
+    },
+    {
+      "username": "user",
+      "enabled": true,
+      "email": "user@example.test",
+      "firstName": "Default",
+      "lastName": "User",
+      "credentials": [
+        { "type": "password", "value": "user", "temporary": false }
+      ],
+      "realmRoles": ["USER"]
+    }
+  ]
+}

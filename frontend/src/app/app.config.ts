@@ -1,15 +1,34 @@
-import { ApplicationConfig, provideBrowserGlobalErrorListeners } from '@angular/core';
+import {
+  ApplicationConfig,
+  inject,
+  provideAppInitializer,
+  provideBrowserGlobalErrorListeners,
+} from '@angular/core';
 import { provideRouter } from '@angular/router';
-import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClient, withInterceptors } from '@angular/common/http';
 
 import { routes } from './app.routes';
-import {provideApi} from '@core/api';
+import { Configuration } from '@core/api';
+import { authSessionInterceptor } from '@core/services/auth-session.interceptor';
+import { AuthService } from '@core/services/auth.service';
+
+export function apiConfigurationFactory(authService: AuthService): Configuration {
+  return new Configuration({
+    basePath: '',
+    credentials: { bearerAuth: () => authService.accessToken() },
+  });
+}
 
 export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),
+    provideAppInitializer(() => inject(AuthService).handleLoginRedirect()),
     provideRouter(routes),
-    provideHttpClient(),
-    provideApi('')
-  ]
+    provideHttpClient(withInterceptors([authSessionInterceptor])),
+    {
+      provide: Configuration,
+      useFactory: apiConfigurationFactory,
+      deps: [AuthService],
+    },
+  ],
 };
