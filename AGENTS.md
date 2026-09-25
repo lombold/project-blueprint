@@ -1,10 +1,12 @@
 # ProjectName — Agent Guide
 
-Mono-repo: Spring Boot 4.0 backend (Java 25, hexagonal) + Angular 21 web frontend + Ionic 8/Angular 21/Capacitor 8 app (Bun, signals).
+Mono-repo: Spring Boot 4.0 backend (Java 25, hexagonal) + Angular 21 web frontend + Ionic 8/Angular 21/Capacitor 8 app
+(Bun, signals).
 
 ## Build / Test / Lint Commands
 
 ### Backend (run from `backend/`)
+
 ```
 mvn spring-boot:run                          # start on :8080
 mvn test                                     # all tests (unit + ArchUnit)
@@ -17,6 +19,7 @@ mvn clean verify                             # full build + test (CI)
 ```
 
 ### Frontend (run from `frontend/`, package manager: Bun)
+
 ```
 bun install                                  # install deps
 bun run start                                # dev server on :4200 (proxies /api to :8080)
@@ -32,6 +35,7 @@ bun run e2e                                  # Playwright E2E (Chromium)
 ```
 
 ### App (run from `app/`, package manager: Bun)
+
 ```
 bun install                                  # install deps
 bun run start                                # browser dev server on :4200
@@ -48,12 +52,14 @@ bun run ios                                  # open the iOS project
 ```
 
 ### Docker
+
 ```
 docker-compose up -d backend                 # containerized backend
 docker-compose up                            # full stack
 ```
 
 ### Pre-commit gate (lefthook)
+
 ```
 lefthook install                             # one-time setup per clone
 lefthook run pre-commit                      # run the gate without committing
@@ -62,56 +68,57 @@ lefthook validate                            # check lefthook.yml is well-formed
 
 `lefthook.yml` gates every commit in three stages, stopping at the first failure:
 
-1. **Auto-fix** — `mvn spotless:apply`; `eslint --fix`, `stylelint --fix`, then `prettier --write`.
-   Fixed files are re-staged.
-2. **Verify** — `mvn verify` (backend), then `lint` + `stylelint` + `depcruise` + unit tests
-   (frontend), plus `stylelint` for the app.
+1. **Auto-fix** — `mvn spotless:apply`; `eslint --fix`, `stylelint --fix`, then `prettier --write`. Fixed files are
+   re-staged.
+2. **Verify** — `mvn verify` (backend), then `lint` + `stylelint` + `depcruise` + unit tests (frontend), plus
+   `stylelint` for the app.
 3. **Drift** — when `openapi.yml` changes, the regenerated Angular clients must be staged with it.
 
-Jobs are path-scoped: a backend-only commit skips the Angular checks. ~13s for a full
-monorepo commit. Production builds stay in CI.
+Jobs are path-scoped: a backend-only commit skips the Angular checks. ~13s for a full monorepo commit. Production builds
+stay in CI.
 
-Checks run against the **working tree, not the staged index** — an unstaged violation anywhere in
-a touched module blocks the commit. The app module's ESLint, depcruise and test jobs are excluded
-until its ESLint config is migrated to flat config (`verify-app` has `skip: true`); its stylelint
-job (`verify-app-style`) is active.
+Checks run against the **working tree, not the staged index** — an unstaged violation anywhere in a touched module
+blocks the commit. The app module's ESLint, depcruise and test jobs are excluded until its ESLint config is migrated to
+flat config (`verify-app` has `skip: true`); its stylelint job (`verify-app-style`) is active.
 
 ## Architecture — Hexagonal (Backend)
 
-Base package: `com.projectname`. ArchUnit's onion architecture rule enforces the domain,
-application, and adapter boundaries; additional rules enforce CQRS and persistence isolation.
+Base package: `com.projectname`. ArchUnit's onion architecture rule enforces the domain, application, and adapter
+boundaries; additional rules enforce CQRS and persistence isolation.
 
-| Ring | Package | May depend on | Must NOT depend on |
-|---|---|---|---|
-| Domain | `domain/{entity,value,exception}` | JDK only (+ Lombok currently) | application, adapter, Spring, JPA |
-| Application | `application/{port,port/in,usecase}` | domain, Spring for use-case wiring | adapter |
-| HTTP adapter | `adapter/{inbound,config}` | inbound ports, domain, Spring, generated HTTP DTOs | use-case implementations, outbound ports/adapters |
-| Persistence adapter | `adapter/outbound/persistence` | outbound ports, domain, Spring Data JPA | inbound ports/adapters |
+| Ring                | Package                              | May depend on                                      | Must NOT depend on                                |
+|---------------------|--------------------------------------|----------------------------------------------------|---------------------------------------------------|
+| Domain              | `domain/{entity,value,exception}`    | JDK only (+ Lombok currently)                      | application, adapter, Spring, JPA                 |
+| Application         | `application/{port,port/in,usecase}` | domain, Spring for use-case wiring                 | adapter                                           |
+| HTTP adapter        | `adapter/{inbound,config}`           | inbound ports, domain, Spring, generated HTTP DTOs | use-case implementations, outbound ports/adapters |
+| Persistence adapter | `adapter/outbound/persistence`       | outbound ports, domain, Spring Data JPA            | inbound ports/adapters                            |
 
 ### Naming conventions
-- Inbound ports: one interface per operation, named `*Command` for writes or `*Query` for reads,
-  in `application/port/in/`. Each declares exactly one `invoke(Args...)` method.
-- Use-case implementations: matching `*CommandImpl` or `*QueryImpl` in `application/usecase/`,
-  implementing exactly the matching inbound port and annotated `@Service @RequiredArgsConstructor`.
-- Outbound ports: `*Port` interfaces in `application/port/` (for example, `UserPort`).
+
+- Inbound ports: one interface per operation, named `*Command` for writes or `*Query` for reads, in
+  `application/port/in/`. Each declares exactly one `invoke(Args...)` method.
+- Use-case implementations: matching `*CommandImpl` or `*QueryImpl` in `application/usecase/`, implementing exactly the
+  matching inbound port and annotated `@Service @RequiredArgsConstructor`.
+- Outbound ports: `*Port` interfaces in `application/port/out/` (for example, `UserPort`).
 - Controllers: `*Controller` in `adapter/inbound/controller/`, implements OpenAPI-generated `*Api`
 - DTOs: generated by OpenAPI plugin into `adapter/inbound/controller/dto/`, suffixed `Dto`
 - JPA entities: `*JpaEntity` in `adapter/outbound/persistence/`
 - JPA repos: `*JpaRepository` extends `JpaRepository<>`
 - Persistence adapters: `*RepositoryAdapter` implements `*Port`
 - Mappers: `*Mapper` (MapStruct interfaces, `@Mapper` annotation)
-  - Inbound: `adapter/inbound/controller/mapper/` (domain <-> DTO)
-  - Outbound: `adapter/outbound/persistence/mapper/` (domain <-> JPA entity)
+    - Inbound: `adapter/inbound/controller/mapper/` (domain <-> DTO)
+    - Outbound: `adapter/outbound/persistence/mapper/` (domain <-> JPA entity)
 
 ### Key rules
+
 - Controllers are thin: validate -> map -> call exactly one inbound `*Command` or `*Query`
-  via `invoke()` per REST method -> map response. Depend on inbound ports, never use-case
-  implementations, outbound ports, or persistence classes.
+  via `invoke()` per REST method -> map response. Depend on inbound ports, never use-case implementations, outbound
+  ports, or persistence classes.
 - Queries are read-only: they must not call save/delete operations on outbound ports.
-- Only JPA entities use `jakarta.persistence` annotations and only `*JpaRepository` interfaces
-  use Spring Data JPA imports; all JPA-specific types stay in outbound persistence.
-- Only `*RepositoryAdapter` classes access `*JpaRepository` interfaces and each implements
-  one outbound port. Outbound adapters must not depend on inbound ports or use cases.
+- Only JPA entities use `jakarta.persistence` annotations and only `*JpaRepository` interfaces use Spring Data JPA
+  imports; all JPA-specific types stay in outbound persistence.
+- Only `*RepositoryAdapter` classes access `*JpaRepository` interfaces and each implements one outbound port. Outbound
+  adapters must not depend on inbound ports or use cases.
 - Never expose domain objects over HTTP; always map to DTOs.
 - JPA entities never leak outside outbound persistence adapter.
 - Value objects (e.g., `UserId`) use private constructor + static `of()` factory, manual `equals`/`hashCode`/`toString`.
@@ -124,6 +131,7 @@ application, and adapter boundaries; additional rules enforce CQRS and persisten
 ## Architecture — Angular Clients
 
 ### Folder structure
+
 ```
 frontend/src/app/
   core/                    # bootstrap, global infra
@@ -146,6 +154,7 @@ and `app/ios/`; modify them only for platform-specific capabilities. Web assets 
 `cap sync` are generated and must not be committed.
 
 ### Import rules (enforced by dependency-cruiser)
+
 - `core/` must NOT import from `pages/`
 - `shared/` must NOT import from `core/` or `pages/`
 - `pages/` features must NOT cross-import each other
@@ -153,66 +162,87 @@ and `app/ios/`; modify them only for platform-specific capabilities. Web assets 
 - No circular dependencies
 
 ### Angular conventions
+
 - **Standalone components only** (no NgModules). Components use `imports: [...]` directly.
 - **OnPush change detection** is the default (configured in `angular.json` schematics).
 - **Signals-first**: use `signal()`, `computed()`, `effect()`. RxJS only when signals are insufficient.
 - `rxResource` for async data fetching (from `@angular/core/rxjs-interop`).
 - Signal-based forms: `form()`, `required()`, `email()` from `@angular/forms/signals`.
-- **Inline templates and styles** by default (per `angular.json` schematics). Templates may use `templateUrl` when large.
+- **Inline templates and styles** by default (per `angular.json` schematics). Templates may use `templateUrl` when
+  large.
 - Component selector prefix: `app-` (kebab-case). Directive prefix: `app` (camelCase).
 - Page components: class named `*Page`, selector `app-{feature}`, file `{feature}.page.ts`.
 - Protect component internals with `protected` or `readonly` where appropriate.
 - In app pages, import Ionic standalone components from `@ionic/angular/standalone`.
-- Configure native identity in `app/capacitor.config.ts`; the initializer replaces the placeholder
-  app ID in Capacitor, Android, and iOS files.
+- Configure native identity in `app/capacitor.config.ts`; the initializer replaces the placeholder app ID in Capacitor,
+  Android, and iOS files.
 
 ## Code Style
 
 ### Java
-- **Formatting**: owned by Spotless + palantir-java-format — 4-space indent, 120-column limit. Never hand-format; run `mvn spotless:apply`. `spotless:check` is bound to the `validate` phase, so any Maven build fails on unformatted code.
-- **Compiler warnings**: `javac` runs with `-Xlint:all,-processing -Werror` and Error Prone, so their warnings fail the build. `processing` is off because Lombok and MapStruct leave Spring/JPA annotations unclaimed. Error Prone's JDK module access is configured in `backend/.mvn/jvm.config`. Serializable types need an explicit `serialVersionUID`; generated OpenAPI models get `@SuppressWarnings("deprecation")` from the generator config.
+
+- **Formatting**: owned by Spotless + palantir-java-format — 4-space indent, 120-column limit. Never hand-format; run
+  `mvn spotless:apply`. `spotless:check` is bound to the `validate` phase, so any Maven build fails on unformatted code.
+- **Compiler warnings**: `javac` runs with `-Xlint:all,-processing -Werror` and Error Prone, so their warnings fail the
+  build. `processing` is off because Lombok and MapStruct leave Spring/JPA annotations unclaimed. Error Prone's JDK
+  module access is configured in `backend/.mvn/jvm.config`. Serializable types need an explicit `serialVersionUID`;
+  generated OpenAPI models get `@SuppressWarnings("deprecation")` from the generator config.
 - **Local variables**: prefer `final var` for type inference (`final var users = ...`).
 - **Method params**: mark `final` (`public ResponseEntity<UserDto> getUserById(final Long id)`).
-- **Imports**: static imports first, then non-static, each alphabetically — applied by the formatter, don't sort by hand. Unused imports are stripped automatically. Prefer explicit imports over wildcards; the formatter neither creates nor expands wildcards, so that one is convention, not enforcement.
-- **Annotations**: Lombok `@Getter @Setter @Builder @RequiredArgsConstructor @AllArgsConstructor @NoArgsConstructor` on adapter/application classes. Domain should avoid Lombok (current code uses it — follow existing pattern until refactored).
+- **Imports**: static imports first, then non-static, each alphabetically — applied by the formatter, don't sort by
+  hand. Unused imports are stripped automatically. Prefer explicit imports over wildcards; the formatter neither creates
+  nor expands wildcards, so that one is convention, not enforcement.
+- **Annotations**: Lombok `@Getter @Setter @Builder @RequiredArgsConstructor @AllArgsConstructor @NoArgsConstructor` on
+  adapter/application classes. Domain should avoid Lombok (current code uses it — follow existing pattern until
+  refactored).
 - **No `@Autowired` field injection** (enforced by ArchUnit). Use constructor injection via `@RequiredArgsConstructor`.
 - **Javadoc**: on public classes and port interfaces. Test classes get a one-line class-level doc.
-- **Tests**: JUnit 5 + Mockito. `@ExtendWith(MockitoExtension.class)`, `@Mock`, `@InjectMocks`. Sections: `// Given`, `// When`, `// Then`. Method names: `should{Expected}` or `should{Expected}When{Condition}`.
+- **Tests**: JUnit 5 + Mockito. `@ExtendWith(MockitoExtension.class)`, `@Mock`, `@InjectMocks`. Sections: `// Given`,
+  `// When`, `// Then`. Method names: `should{Expected}` or `should{Expected}When{Condition}`.
 
 ### TypeScript / Angular
+
 - **Formatting**: Prettier — 100 char line width, single quotes, 2-space indent, trailing newline.
 - **HTML**: parsed with `angular` parser by Prettier.
-- **Strict TypeScript**: `strict: true`, `noImplicitReturns`, `noFallthroughCasesInSwitch`, `noPropertyAccessFromIndexSignature`.
+- **Strict TypeScript**: `strict: true`, `noImplicitReturns`, `noFallthroughCasesInSwitch`,
+  `noPropertyAccessFromIndexSignature`.
 - **Imports**: named imports from specific modules. Use barrel `index.ts` exports for `core/api`.
 - **Vitest globals**: `describe`, `it`, `expect`, `vi` are globally available (no import needed).
 - **Test structure**: `describe('ComponentName', () => { it('does X', async () => { ... }) })`.
-- **Test setup**: `TestBed.configureTestingModule({ imports: [Component], providers: [...mocks] })`. Mock services with `vi.fn()`.
-- **Tailwind CSS v4**: utility-first, no custom CSS unless unavoidable. No separate `tailwind.config` file (v4 PostCSS plugin).
+- **Test setup**: `TestBed.configureTestingModule({ imports: [Component], providers: [...mocks] })`. Mock services with
+  `vi.fn()`.
+- **Tailwind CSS v4**: utility-first, no custom CSS unless unavoidable. No separate `tailwind.config` file (v4 PostCSS
+  plugin).
 - **SCSS**: style language is `scss` (per `angular.json`), but prefer Tailwind utilities over custom SCSS.
-- **Stylesheet linting**: Stylelint (`stylelint-config-standard-scss`) owns SCSS/CSS correctness;
-  Prettier still owns formatting. Config in `frontend/.stylelintrc.json` and `app/.stylelintrc.json`.
-  The frontend config allows Tailwind v4's CSS-first at-rules (`@theme`, `@apply`, `@utility`, …).
+- **Stylesheet linting**: Stylelint (`stylelint-config-standard-scss`) owns SCSS/CSS correctness; Prettier still owns
+  formatting. Config in `frontend/.stylelintrc.json` and `app/.stylelintrc.json`. The frontend config allows Tailwind
+  v4's CSS-first at-rules (`@theme`, `@apply`, `@utility`, …).
 
 ## Error Handling
 
 ### Backend
+
 - Domain validation: throw `IllegalArgumentException` with descriptive message.
 - Resource not found: throw `ResourceNotFoundException` (domain exception).
 - Business rule violations: throw `DomainException`.
-- `GlobalExceptionHandler` maps: `ResourceNotFoundException` -> 404, `DomainException` -> 400, `IllegalArgumentException` -> 400, unhandled `Exception` -> 500 (generic message, no stack leak).
+- `GlobalExceptionHandler` maps: `ResourceNotFoundException` -> 404, `DomainException` -> 400,
+  `IllegalArgumentException` -> 400, unhandled `Exception` -> 500 (generic message, no stack leak).
 
 ### Angular clients
+
 - `rxResource` exposes `.error()` signal — use `computed()` to derive error state.
 - HTTP errors in manual subscribes: `subscribe({ error: (err) => console.error(...) })`.
 - Template: `@if (loadError())` blocks for user-facing error messages.
 
 ## CI (`.github/workflows/`)
+
 - **test.yml**: push/PR to `main`. Backend plus generated-client drift, web checks, and app checks.
 - **app-native.yml**: Android debug build on Linux and unsigned iOS simulator build on macOS.
 - **docker.yml**: after test passes on `main`. Multi-stage Docker build, pushes to GHCR.
 - **e2e.yml**: after Docker build. Playwright against containerized app.
 
 ## Git Conventions
+
 - Branches: `feature/<summary>` or `fix/<summary>`
 - Commits: describe **why**, not what. Group backend + frontend changes per logical unit.
 - Never commit secrets or `.env` files.

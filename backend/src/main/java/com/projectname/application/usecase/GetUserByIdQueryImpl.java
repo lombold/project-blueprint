@@ -1,14 +1,16 @@
 package com.projectname.application.usecase;
 
-import com.projectname.application.port.UserPort;
 import com.projectname.application.port.in.GetUserByIdQuery;
+import com.projectname.application.port.out.UserPort;
 import com.projectname.domain.entity.User;
 import com.projectname.domain.exception.ResourceNotFoundException;
 import com.projectname.domain.value.UserId;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-/** Loads a user or reports its absence. */
+/**
+ * Loads a user or reports its absence.
+ */
 @Service
 @RequiredArgsConstructor
 public class GetUserByIdQueryImpl implements GetUserByIdQuery {

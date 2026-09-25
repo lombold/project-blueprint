@@ -1,14 +1,17 @@
 package com.projectname.application.usecase;
 
-import com.projectname.application.port.UserPort;
 import com.projectname.application.port.in.CreateUserCommand;
+import com.projectname.application.port.out.UserPort;
 import com.projectname.domain.entity.User;
-import java.time.OffsetDateTime;
-import java.time.ZoneId;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-/** Validates and persists a new user. */
+import java.time.OffsetDateTime;
+import java.time.ZoneId;
+
+/**
+ * Validates and persists a new user.
+ */
 @Service
 @RequiredArgsConstructor
 public class CreateUserCommandImpl implements CreateUserCommand {

@@ -1,16 +1,19 @@
 package com.projectname.application.usecase;
 
-import com.projectname.application.port.UserPort;
 import com.projectname.application.port.in.UpdateUserCommand;
+import com.projectname.application.port.out.UserPort;
 import com.projectname.domain.entity.User;
 import com.projectname.domain.exception.ResourceNotFoundException;
 import com.projectname.domain.value.UserId;
-import java.time.OffsetDateTime;
-import java.time.ZoneId;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-/** Applies permitted changes to an existing user. */
+import java.time.OffsetDateTime;
+import java.time.ZoneId;
+
+/**
+ * Applies permitted changes to an existing user.
+ */
 @Service
 @RequiredArgsConstructor
 public class UpdateUserCommandImpl implements UpdateUserCommand {

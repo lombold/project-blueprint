@@ -63,5 +63,5 @@ lefthook-local.yml
 .gradle
 build/
 dist/
-out/
+/out/
 .idea/modules.xml
