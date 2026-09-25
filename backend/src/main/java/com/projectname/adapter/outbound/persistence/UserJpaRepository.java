@@ -4,8 +4,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 /**
- * Spring Data JPA repository for User entities.
- * This is an adapter implementing the UserPort interface.
+ * Spring Data JPA repository for persisted users.
+ * UserRepositoryAdapter implements the outbound port using this repository.
  */
 @Repository
 public interface UserJpaRepository extends JpaRepository<UserJpaEntity, Long> {

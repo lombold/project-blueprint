@@ -4,13 +4,16 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 
 import com.projectname.adapter.inbound.controller.dto.UserDto;
 import com.projectname.adapter.inbound.controller.mapper.UserMapper;
-import com.projectname.application.port.in.UserUseCase;
+import com.projectname.application.port.in.CreateUserCommand;
+import com.projectname.application.port.in.DeleteUserCommand;
+import com.projectname.application.port.in.GetUserByIdQuery;
+import com.projectname.application.port.in.ListUsersQuery;
+import com.projectname.application.port.in.UpdateUserCommand;
 import com.projectname.domain.entity.User;
 import com.projectname.domain.exception.ResourceNotFoundException;
 import com.projectname.domain.value.UserId;
@@ -33,7 +36,19 @@ import org.springframework.http.HttpStatus;
 class UserControllerTest {
 
     @Mock
-    private UserUseCase userUseCase;
+    private CreateUserCommand createUserCommand;
+
+    @Mock
+    private UpdateUserCommand updateUserCommand;
+
+    @Mock
+    private DeleteUserCommand deleteUserCommand;
+
+    @Mock
+    private GetUserByIdQuery getUserByIdQuery;
+
+    @Mock
+    private ListUsersQuery listUsersQuery;
 
     @Mock
     private UserMapper userMapper;
@@ -89,7 +104,7 @@ class UserControllerTest {
     void shouldGetAllUsers() {
         // Given
         final var users = Arrays.asList(user1, user2);
-        when(userUseCase.getAllUsers()).thenReturn(users);
+        when(listUsersQuery.invoke()).thenReturn(users);
         when(userMapper.toDto(user1)).thenReturn(userDto1);
         when(userMapper.toDto(user2)).thenReturn(userDto2);
 
@@ -108,7 +123,7 @@ class UserControllerTest {
     @Test
     void shouldGetUserById() {
         // Given
-        when(userUseCase.getUserById(UserId.of(1L))).thenReturn(user1);
+        when(getUserByIdQuery.invoke(UserId.of(1L))).thenReturn(user1);
         when(userMapper.toDto(user1)).thenReturn(userDto1);
 
         // When
@@ -126,7 +141,7 @@ class UserControllerTest {
     @Test
     void shouldReturn404WhenUserNotFound() {
         // Given
-        when(userUseCase.getUserById(UserId.of(999L)))
+        when(getUserByIdQuery.invoke(UserId.of(999L)))
                 .thenThrow(new ResourceNotFoundException("User not found with ID: 999"));
 
         // When & Then
@@ -163,7 +178,7 @@ class UserControllerTest {
                 .build();
 
         when(userMapper.toDomain(any(UserDto.class))).thenReturn(createUser);
-        when(userUseCase.createUser(any(User.class))).thenReturn(createdUser);
+        when(createUserCommand.invoke(any(User.class))).thenReturn(createdUser);
         when(userMapper.toDto(createdUser)).thenReturn(createdDTO);
 
         // When
@@ -208,7 +223,7 @@ class UserControllerTest {
                 .build();
 
         when(userMapper.toDomain(any(UserDto.class))).thenReturn(updateUser);
-        when(userUseCase.updateUser(any(UserId.class), any(User.class))).thenReturn(updatedUser);
+        when(updateUserCommand.invoke(any(UserId.class), any(User.class))).thenReturn(updatedUser);
         when(userMapper.toDto(updatedUser)).thenReturn(updatedDTO);
 
         // When
@@ -226,8 +241,6 @@ class UserControllerTest {
     @Test
     void shouldDeleteUser() {
         // Given
-        doNothing().when(userUseCase).deleteUser(UserId.of(1L));
-
         // When
         final var response = userController.deleteUser(1L);
 
@@ -240,8 +253,8 @@ class UserControllerTest {
     void shouldThrowExceptionWhenDeletingNonExistentUser() {
         // Given
         doThrow(new ResourceNotFoundException("User not found with ID: 999"))
-                .when(userUseCase)
-                .deleteUser(UserId.of(999L));
+                .when(deleteUserCommand)
+                .invoke(UserId.of(999L));
 
         // When & Then
         assertThrows(ResourceNotFoundException.class, () -> {

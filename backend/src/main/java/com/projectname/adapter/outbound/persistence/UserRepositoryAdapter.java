@@ -1,7 +1,7 @@
 package com.projectname.adapter.outbound.persistence;
 
 import com.projectname.adapter.outbound.persistence.mapper.UserJpaMapper;
-import com.projectname.application.port.UserPort;
+import com.projectname.application.port.out.UserPort;
 import com.projectname.domain.entity.User;
 import com.projectname.domain.value.UserId;
 import java.util.List;

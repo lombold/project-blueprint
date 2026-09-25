@@ -2,7 +2,11 @@ package com.projectname.adapter.inbound.controller;
 
 import com.projectname.adapter.inbound.controller.dto.UserDto;
 import com.projectname.adapter.inbound.controller.mapper.UserMapper;
-import com.projectname.application.port.in.UserUseCase;
+import com.projectname.application.port.in.CreateUserCommand;
+import com.projectname.application.port.in.DeleteUserCommand;
+import com.projectname.application.port.in.GetUserByIdQuery;
+import com.projectname.application.port.in.ListUsersQuery;
+import com.projectname.application.port.in.UpdateUserCommand;
 import com.projectname.domain.value.UserId;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -18,19 +22,23 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class UserController implements UsersApi {
 
-    private final UserUseCase userUseCase;
+    private final CreateUserCommand createUserCommand;
+    private final UpdateUserCommand updateUserCommand;
+    private final DeleteUserCommand deleteUserCommand;
+    private final GetUserByIdQuery getUserByIdQuery;
+    private final ListUsersQuery listUsersQuery;
     private final UserMapper userMapper;
 
     @Override
     public ResponseEntity<List<UserDto>> listUsers() {
-        final var users = userUseCase.getAllUsers();
+        final var users = listUsersQuery.invoke();
         final var userDTOs = users.stream().map(userMapper::toDto).toList();
         return ResponseEntity.ok(userDTOs);
     }
 
     @Override
     public ResponseEntity<UserDto> getUserById(final Long id) {
-        final var user = userUseCase.getUserById(UserId.of(id));
+        final var user = getUserByIdQuery.invoke(UserId.of(id));
         final var userDTO = userMapper.toDto(user);
         return ResponseEntity.ok(userDTO);
     }
@@ -38,7 +46,7 @@ public class UserController implements UsersApi {
     @Override
     public ResponseEntity<UserDto> createUser(final UserDto userDTO) {
         final var user = userMapper.toDomain(userDTO);
-        final var createdUser = userUseCase.createUser(user);
+        final var createdUser = createUserCommand.invoke(user);
         final var createdDTO = userMapper.toDto(createdUser);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdDTO);
     }
@@ -46,14 +54,14 @@ public class UserController implements UsersApi {
     @Override
     public ResponseEntity<UserDto> updateUser(final Long id, final UserDto userDTO) {
         final var user = userMapper.toDomain(userDTO);
-        final var updatedUser = userUseCase.updateUser(UserId.of(id), user);
+        final var updatedUser = updateUserCommand.invoke(UserId.of(id), user);
         final var updatedDTO = userMapper.toDto(updatedUser);
         return ResponseEntity.ok(updatedDTO);
     }
 
     @Override
     public ResponseEntity<Void> deleteUser(final Long id) {
-        userUseCase.deleteUser(UserId.of(id));
+        deleteUserCommand.invoke(UserId.of(id));
         return ResponseEntity.noContent().build();
     }
 }
