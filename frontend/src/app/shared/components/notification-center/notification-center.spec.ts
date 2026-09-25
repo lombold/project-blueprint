@@ -68,15 +68,9 @@ describe('NotificationCenterComponent', () => {
     const buttons = fixture.nativeElement.querySelectorAll('button');
 
     expect(buttons).toHaveLength(3);
-    expect(buttons[0].getAttribute('aria-label')).toBe(
-      'Dismiss warn notification: First warning',
-    );
-    expect(buttons[1].getAttribute('aria-label')).toBe(
-      'Dismiss warn notification: Second warning',
-    );
-    expect(buttons[2].getAttribute('aria-label')).toBe(
-      'Dismiss error notification: Error message',
-    );
+    expect(buttons[0].getAttribute('aria-label')).toBe('Dismiss warn notification: First warning');
+    expect(buttons[1].getAttribute('aria-label')).toBe('Dismiss warn notification: Second warning');
+    expect(buttons[2].getAttribute('aria-label')).toBe('Dismiss error notification: Error message');
   });
 
   it('emits the dismissed notification id', () => {
@@ -91,10 +85,6 @@ describe('NotificationCenterComponent', () => {
   });
 });
 
-function notification(
-  id: string,
-  type: AppNotification['type'],
-  message: string,
-): AppNotification {
+function notification(id: string, type: AppNotification['type'], message: string): AppNotification {
   return { id, type, message };
 }

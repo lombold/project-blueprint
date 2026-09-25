@@ -1,0 +1,7 @@
+.angular/
+coverage/
+dist/
+node_modules/
+playwright-report/
+test-results/
+src/app/core/api/

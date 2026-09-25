@@ -9,7 +9,7 @@ Frontend: prettier ()
 
 ## Linting and best practices
 Backend: checkstyle (checkstyle-style)
-Frontend: eslint (with angular-eslint), stylelint
+Frontend: eslint (with angular-eslint, templateChecks), stylelint
 
 ## Architecture 
 Backend:
@@ -21,6 +21,9 @@ Frontend:
 
 ## Enforcement
 CI Pipeline (github actions)
+
+maven verify: enforcer:enforce, spotless:check, checkstyle:check
+
 => pre-commit hooks
 
 

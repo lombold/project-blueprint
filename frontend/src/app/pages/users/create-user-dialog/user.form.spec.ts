@@ -27,12 +27,15 @@ describe('UserForm', () => {
     usernameInput.value = 'ada';
     usernameInput.dispatchEvent(new Event('input'));
 
-    const emailInput = fixture.debugElement.query(By.css('#email')).nativeElement as HTMLInputElement;
+    const emailInput = fixture.debugElement.query(By.css('#email'))
+      .nativeElement as HTMLInputElement;
     emailInput.value = 'ada@example.com';
     emailInput.dispatchEvent(new Event('input'));
     fixture.detectChanges();
 
-    fixture.debugElement.query(By.css('form')).triggerEventHandler('submit', new SubmitEvent('submit'));
+    fixture.debugElement
+      .query(By.css('form'))
+      .triggerEventHandler('submit', new SubmitEvent('submit'));
     await fixture.whenStable();
 
     expect(submitted).toEqual([{ username: 'ada', email: 'ada@example.com' }]);
@@ -47,7 +50,9 @@ describe('UserForm', () => {
     fixture.componentInstance['submitForm'].subscribe((request) => submitted.push(request));
     fixture.detectChanges();
 
-    fixture.debugElement.query(By.css('form')).triggerEventHandler('submit', new SubmitEvent('submit'));
+    fixture.debugElement
+      .query(By.css('form'))
+      .triggerEventHandler('submit', new SubmitEvent('submit'));
 
     expect(submitted).toEqual([]);
   });
@@ -66,12 +71,15 @@ describe('UserForm', () => {
     usernameInput.value = 'ada';
     usernameInput.dispatchEvent(new Event('input'));
 
-    const emailInput = fixture.debugElement.query(By.css('#email')).nativeElement as HTMLInputElement;
+    const emailInput = fixture.debugElement.query(By.css('#email'))
+      .nativeElement as HTMLInputElement;
     emailInput.value = 'not-an-email';
     emailInput.dispatchEvent(new Event('input'));
     fixture.detectChanges();
 
-    fixture.debugElement.query(By.css('form')).triggerEventHandler('submit', new SubmitEvent('submit'));
+    fixture.debugElement
+      .query(By.css('form'))
+      .triggerEventHandler('submit', new SubmitEvent('submit'));
 
     expect(submitted).toEqual([]);
   });

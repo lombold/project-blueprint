@@ -8,6 +8,8 @@
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "lint": "ng lint",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
     "stylelint": "stylelint \"src/**/*.scss\"",
     "e2e": "ng e2e",
     "test:ci": "ng test --coverage",

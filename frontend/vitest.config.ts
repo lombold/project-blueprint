@@ -11,17 +11,14 @@ export default defineConfig({
     coverage: {
       provider: 'v8',
       reporter: ['text', 'json', 'html'],
-      exclude: [
-        'node_modules/',
-        'src/test.ts',
-      ]
-    }
+      exclude: ['node_modules/', 'src/test.ts'],
+    },
   },
   resolve: {
     alias: {
       '@core': '/src/app/core',
       '@pages': '/src/app/pages',
-      '@shared': '/src/app/shared'
-    }
-  }
+      '@shared': '/src/app/shared',
+    },
+  },
 });

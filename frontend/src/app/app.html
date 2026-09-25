@@ -3,9 +3,7 @@
     <a routerLink="/users" class="text-2xl font-bold">ProjectName</a>
     <ul class="flex gap-8 items-center">
       <li>
-        <a routerLink="/users" class="hover:text-indigo-200 transition-colors"
-          >Users</a
-        >
+        <a routerLink="/users" class="hover:text-indigo-200 transition-colors">Users</a>
       </li>
     </ul>
     <div
@@ -22,9 +20,7 @@
         aria-haspopup="menu"
         (click)="toggleProfileMenu()"
       >
-        <span
-          class="flex h-7 w-7 items-center justify-center rounded-full bg-indigo-800"
-        >
+        <span class="flex h-7 w-7 items-center justify-center rounded-full bg-indigo-800">
           <svg lucideUserRound size="16" aria-hidden="true"></svg>
         </span>
         <span class="max-w-32 truncate">{{ displayName() }}</span>
@@ -32,25 +28,25 @@
       </button>
 
       @if (profileMenuOpen()) {
-      <div
-        class="absolute right-0 mt-2 w-56 rounded-md border border-zinc-200 bg-white py-2 text-zinc-950 shadow-xl"
-        role="menu"
-      >
-        <div class="border-b border-zinc-100 px-4 pb-2 pt-1 text-sm">
-          <p class="font-medium">{{ displayName() }}</p>
-          <p class="text-xs text-zinc-500">Signed in</p>
-        </div>
-        <button
-          type="button"
-          data-testid="logout-button"
-          class="flex w-full items-center gap-2 px-4 py-2 text-left text-sm text-red-700 transition-colors hover:bg-red-50"
-          role="menuitem"
-          (click)="logout()"
+        <div
+          class="absolute right-0 mt-2 w-56 rounded-md border border-zinc-200 bg-white py-2 text-zinc-950 shadow-xl"
+          role="menu"
         >
-          <svg lucideLogOut size="16" aria-hidden="true"></svg>
-          Log out
-        </button>
-      </div>
+          <div class="border-b border-zinc-100 px-4 pb-2 pt-1 text-sm">
+            <p class="font-medium">{{ displayName() }}</p>
+            <p class="text-xs text-zinc-500">Signed in</p>
+          </div>
+          <button
+            type="button"
+            data-testid="logout-button"
+            class="flex w-full items-center gap-2 px-4 py-2 text-left text-sm text-red-700 transition-colors hover:bg-red-50"
+            role="menuitem"
+            (click)="logout()"
+          >
+            <svg lucideLogOut size="16" aria-hidden="true"></svg>
+            Log out
+          </button>
+        </div>
       }
     </div>
   </div>
