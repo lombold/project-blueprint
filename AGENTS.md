@@ -158,7 +158,7 @@ and `app/ios/`; modify them only for platform-specific capabilities. Web assets 
 
 ### Java
 - **Formatting**: owned by Spotless + palantir-java-format — 4-space indent, 120-column limit. Never hand-format; run `mvn spotless:apply`. `spotless:check` is bound to the `validate` phase, so any Maven build fails on unformatted code.
-- **Compiler warnings**: `javac` runs with `-Xlint:all,-processing -Werror`, so any lint warning fails the build. `processing` is off because Lombok and MapStruct leave Spring/JPA annotations unclaimed. Serializable types need an explicit `serialVersionUID`; generated OpenAPI models get `@SuppressWarnings("deprecation")` from the generator config.
+- **Compiler warnings**: `javac` runs with `-Xlint:all,-processing -Werror` and Error Prone, so their warnings fail the build. `processing` is off because Lombok and MapStruct leave Spring/JPA annotations unclaimed. Error Prone's JDK module access is configured in `backend/.mvn/jvm.config`. Serializable types need an explicit `serialVersionUID`; generated OpenAPI models get `@SuppressWarnings("deprecation")` from the generator config.
 - **Local variables**: prefer `final var` for type inference (`final var users = ...`).
 - **Method params**: mark `final` (`public ResponseEntity<UserDto> getUserById(final Long id)`).
 - **Imports**: static imports first, then non-static, each alphabetically — applied by the formatter, don't sort by hand. Unused imports are stripped automatically. Prefer explicit imports over wildcards; the formatter neither creates nor expands wildcards, so that one is convention, not enforcement.

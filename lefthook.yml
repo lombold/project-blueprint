@@ -77,11 +77,11 @@ pre-commit:
     # regenerates frontend/src/app/core/api, and linting those files while
     # they are being written is a race.
     #
-    # Covers enforcer, spotless:check, checkstyle, -Werror compile, tests,
+    # Covers enforcer, spotless:check, checkstyle, Error Prone, -Werror compile, tests,
     # ArchUnit and SpotBugs + find-sec-bugs.
     - name: verify-backend
       root: backend/
-      glob: "*.{java,xml,yml,yaml,sql,properties}"
+      glob: "*.{java,xml,yml,yaml,sql,properties,config}"
       run: mvn verify
 
     - name: verify-frontend

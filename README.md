@@ -84,9 +84,10 @@ Backend Checkstyle rules in `backend/checkstyle.xml` are adapted from the pinned
 project configuration. Spotless remains the Java formatter; Checkstyle checks code structure,
 naming, documentation, and complexity.
 
-The backend compiles with `-Xlint:all,-processing -Werror`, so every javac lint warning fails the
-build. The `processing` category is excluded because Lombok and MapStruct leave Spring and JPA
-annotations unclaimed on every build, which no source change can fix.
+The backend compiles with `-Xlint:all,-processing -Werror` and Error Prone, so javac and Error
+Prone warnings fail the build. The `processing` category is excluded because Lombok and MapStruct
+leave Spring and JPA annotations unclaimed on every build, which no source change can fix. Error
+Prone's required JDK module access is configured in `backend/.mvn/jvm.config`.
 
 ## Pre-Commit Quality Gate
 
@@ -105,9 +106,9 @@ The gate runs in three stages, stopping at the first failure:
 1. **Auto-fix** — `mvn spotless:apply` for Java; `eslint --fix`, `stylelint --fix` and then
    `prettier --write` for the frontend; `stylelint --fix` for the app. Repaired files are
    re-staged automatically.
-2. **Verify** — `mvn verify` for the backend (enforcer, Spotless, Checkstyle, `-Werror` compile,
-   tests, ArchUnit, SpotBugs + find-sec-bugs), then `lint`, `stylelint`, `depcruise` and the unit
-   tests for the frontend, plus `stylelint` for the app.
+2. **Verify** — `mvn verify` for the backend (enforcer, Spotless, Checkstyle, Error Prone,
+   `-Werror` compile, tests, ArchUnit, SpotBugs + find-sec-bugs), then `lint`, `stylelint`,
+   `depcruise` and the unit tests for the frontend, plus `stylelint` for the app.
 3. **Drift** — when `openapi.yml` changes, asserts the regenerated Angular clients are staged
    alongside it, mirroring the CI check.
 

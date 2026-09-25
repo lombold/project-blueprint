@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 
 import com.projectname.adapter.inbound.controller.dto.UserDto;
@@ -14,6 +15,7 @@ import com.projectname.domain.entity.User;
 import com.projectname.domain.exception.ResourceNotFoundException;
 import com.projectname.domain.value.UserId;
 import java.time.OffsetDateTime;
+import java.time.ZoneId;
 import java.util.Arrays;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -46,7 +48,7 @@ class UserControllerTest {
 
     @BeforeEach
     void setUp() {
-        final var now = OffsetDateTime.now();
+        final var now = OffsetDateTime.now(ZoneId.systemDefault());
 
         // Setup domain users
         user1 = User.builder()
@@ -148,8 +150,8 @@ class UserControllerTest {
                 .id(UserId.of(3L))
                 .username("newuser")
                 .email("newuser@example.com")
-                .createdAt(OffsetDateTime.now())
-                .updatedAt(OffsetDateTime.now())
+                .createdAt(OffsetDateTime.now(ZoneId.systemDefault()))
+                .updatedAt(OffsetDateTime.now(ZoneId.systemDefault()))
                 .build();
 
         final var createdDTO = UserDto.builder()
@@ -194,7 +196,7 @@ class UserControllerTest {
                 .username("updateduser")
                 .email("updated@example.com")
                 .createdAt(user1.getCreatedAt())
-                .updatedAt(OffsetDateTime.now())
+                .updatedAt(OffsetDateTime.now(ZoneId.systemDefault()))
                 .build();
 
         final var updatedDTO = UserDto.builder()
@@ -237,12 +239,13 @@ class UserControllerTest {
     @Test
     void shouldThrowExceptionWhenDeletingNonExistentUser() {
         // Given
-        when(userUseCase.getUserById(UserId.of(999L)))
-                .thenThrow(new ResourceNotFoundException("User not found with ID: 999"));
+        doThrow(new ResourceNotFoundException("User not found with ID: 999"))
+                .when(userUseCase)
+                .deleteUser(UserId.of(999L));
 
         // When & Then
         assertThrows(ResourceNotFoundException.class, () -> {
-            userUseCase.getUserById(UserId.of(999L));
+            userController.deleteUser(999L);
         });
     }
 }

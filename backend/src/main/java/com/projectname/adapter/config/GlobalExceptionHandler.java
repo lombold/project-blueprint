@@ -6,6 +6,7 @@ import com.projectname.adapter.inbound.controller.dto.ValidationErrorResponseDto
 import com.projectname.domain.exception.DomainException;
 import com.projectname.domain.exception.ResourceNotFoundException;
 import java.time.OffsetDateTime;
+import java.time.ZoneId;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -39,7 +40,7 @@ public class GlobalExceptionHandler {
         final var error = ErrorResponseDto.builder()
                 .status(HttpStatus.NOT_FOUND.value())
                 .message(ex.getMessage())
-                .timestamp(OffsetDateTime.now())
+                .timestamp(OffsetDateTime.now(ZoneId.systemDefault()))
                 .build();
         return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
     }
@@ -57,7 +58,7 @@ public class GlobalExceptionHandler {
         final var error = ErrorResponseDto.builder()
                 .status(HttpStatus.BAD_REQUEST.value())
                 .message(ex.getMessage())
-                .timestamp(OffsetDateTime.now())
+                .timestamp(OffsetDateTime.now(ZoneId.systemDefault()))
                 .build();
         return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
     }
@@ -76,7 +77,7 @@ public class GlobalExceptionHandler {
         final var error = ErrorResponseDto.builder()
                 .status(HttpStatus.BAD_REQUEST.value())
                 .message(ex.getMessage())
-                .timestamp(OffsetDateTime.now())
+                .timestamp(OffsetDateTime.now(ZoneId.systemDefault()))
                 .build();
         return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
     }
@@ -98,7 +99,7 @@ public class GlobalExceptionHandler {
         final var error = ValidationErrorResponseDto.builder()
                 .status(HttpStatus.BAD_REQUEST.value())
                 .message(ex.getMessage())
-                .timestamp(OffsetDateTime.now())
+                .timestamp(OffsetDateTime.now(ZoneId.systemDefault()))
                 .errors(errors)
                 .build();
 
@@ -128,7 +129,7 @@ public class GlobalExceptionHandler {
         final var error = ErrorResponseDto.builder()
                 .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
                 .message("An internal server error occurred")
-                .timestamp(OffsetDateTime.now())
+                .timestamp(OffsetDateTime.now(ZoneId.systemDefault()))
                 .build();
         return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
     }

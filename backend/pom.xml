@@ -30,6 +30,7 @@
         <mapstruct.version>1.6.3</mapstruct.version>
         <lombok.version>1.18.42</lombok.version>
         <lombok-mapstruct-binding.version>0.2.0</lombok-mapstruct-binding.version>
+        <error-prone.version>2.50.0</error-prone.version>
         <openapi.generator.version>7.20.0</openapi.generator.version>
         <swagger-annotations.version>2.2.43</swagger-annotations.version>
         <spotless-maven-plugin.version>3.9.0</spotless-maven-plugin.version>
@@ -181,9 +182,17 @@
                             <artifactId>lombok-mapstruct-binding</artifactId>
                             <version>${lombok-mapstruct-binding.version}</version>
                         </path>
+                        <path>
+                            <groupId>com.google.errorprone</groupId>
+                            <artifactId>error_prone_core</artifactId>
+                            <version>${error-prone.version}</version>
+                        </path>
                     </annotationProcessorPaths>
 
                     <compilerArgs>
+                        <arg>-XDcompilePolicy=simple</arg>
+                        <arg>--should-stop=ifError=FLOW</arg>
+                        <arg>-Xplugin:ErrorProne</arg>
                         <!-- All javac lint categories except `processing`: Lombok and
                              MapStruct leave Spring/JPA annotations unclaimed, which that
                              category reports on every build and no source change can fix. -->

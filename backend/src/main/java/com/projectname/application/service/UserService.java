@@ -6,6 +6,7 @@ import com.projectname.domain.entity.User;
 import com.projectname.domain.exception.ResourceNotFoundException;
 import com.projectname.domain.value.UserId;
 import java.time.OffsetDateTime;
+import java.time.ZoneId;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -20,7 +21,7 @@ public class UserService implements UserUseCase {
     @Override
     public User createUser(User user) {
         user.setId(null); // prevent client-supplied id from overwriting an existing row via save()
-        OffsetDateTime now = OffsetDateTime.now();
+        OffsetDateTime now = OffsetDateTime.now(ZoneId.systemDefault());
         user.setCreatedAt(now);
         user.setUpdatedAt(now);
         user.validate();
@@ -46,7 +47,7 @@ public class UserService implements UserUseCase {
         if (userUpdates.getEmail() != null) {
             existingUser.setEmail(userUpdates.getEmail());
         }
-        existingUser.setUpdatedAt(OffsetDateTime.now());
+        existingUser.setUpdatedAt(OffsetDateTime.now(ZoneId.systemDefault()));
         existingUser.validate();
         return userPort.save(existingUser);
     }

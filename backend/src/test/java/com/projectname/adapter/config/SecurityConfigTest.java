@@ -28,7 +28,7 @@ class SecurityConfigTest {
         assertEquals(
                 List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"), corsConfiguration.getAllowedMethods());
         assertEquals(List.of("*"), corsConfiguration.getAllowedHeaders());
-        assertEquals(Boolean.FALSE, corsConfiguration.getAllowCredentials());
+        assertFalse(corsConfiguration.getAllowCredentials());
     }
 
     @Test
