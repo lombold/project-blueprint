@@ -76,8 +76,13 @@ Backend (run from `backend/`):
 - start: `mvn spring-boot:run`
 - start with local snapshot: `mvn spring-boot:run -Dspring-boot.run.profiles=local`
 - test: `mvn test`
+- code style: `mvn checkstyle:check` (also runs during `validate`)
 - full verification: `mvn clean verify`
 - regenerate API contracts: `mvn generate-sources`
+
+Backend Checkstyle rules in `backend/checkstyle.xml` are adapted from the pinned Checkstyle
+project configuration. Spotless remains the Java formatter; Checkstyle checks code structure,
+naming, documentation, and complexity.
 
 ## Local Authentication
 

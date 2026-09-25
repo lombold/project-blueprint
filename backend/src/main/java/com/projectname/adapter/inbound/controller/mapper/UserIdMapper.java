@@ -3,6 +3,7 @@ package com.projectname.adapter.inbound.controller.mapper;
 import com.projectname.domain.value.UserId;
 import org.mapstruct.Mapper;
 
+/** Converts HTTP user identifiers to and from domain value objects. */
 @Mapper
 public interface UserIdMapper {
 

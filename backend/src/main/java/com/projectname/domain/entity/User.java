@@ -2,8 +2,13 @@ package com.projectname.domain.entity;
 
 import com.projectname.domain.value.UserId;
 import java.time.OffsetDateTime;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
+/** Domain user with validation for account fields. */
 @Getter
 @Setter
 @NoArgsConstructor

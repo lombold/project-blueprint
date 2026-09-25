@@ -1,6 +1,8 @@
 package com.projectname.adapter.inbound.controller;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
@@ -35,7 +37,7 @@ class UserControllerTest {
     private UserMapper userMapper;
 
     @InjectMocks
-    private com.projectname.adapter.inbound.controller.UserController userController;
+    private UserController userController;
 
     private User user1;
     private User user2;

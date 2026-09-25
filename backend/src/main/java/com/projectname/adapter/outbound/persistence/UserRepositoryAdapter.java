@@ -10,6 +10,7 @@ import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+/** Implements user persistence through the JPA repository. */
 @Component
 @RequiredArgsConstructor
 public class UserRepositoryAdapter implements UserPort {

@@ -4,6 +4,7 @@ import com.projectname.domain.entity.User;
 import com.projectname.domain.value.UserId;
 import java.util.List;
 
+/** Defines user operations available to inbound adapters. */
 public interface UserUseCase {
 
     User createUser(User user);

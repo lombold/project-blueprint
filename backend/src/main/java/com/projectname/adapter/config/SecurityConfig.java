@@ -20,6 +20,7 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+/** Configures API authentication, browser security headers, and CORS. */
 @Configuration
 @EnableWebSecurity
 @EnableConfigurationProperties(CorsProperties.class)

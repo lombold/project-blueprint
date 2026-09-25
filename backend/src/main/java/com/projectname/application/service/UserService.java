@@ -10,6 +10,7 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+/** Implements user operations and validates changes before persistence. */
 @Service
 @RequiredArgsConstructor
 public class UserService implements UserUseCase {

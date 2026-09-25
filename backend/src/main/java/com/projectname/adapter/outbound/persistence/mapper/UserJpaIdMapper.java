@@ -3,6 +3,7 @@ package com.projectname.adapter.outbound.persistence.mapper;
 import com.projectname.domain.value.UserId;
 import org.mapstruct.Mapper;
 
+/** Converts persisted user identifiers to and from domain value objects. */
 @Mapper
 public interface UserJpaIdMapper {
 

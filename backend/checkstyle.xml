@@ -1,0 +1,123 @@
+<?xml version="1.0"?>
+<!DOCTYPE module PUBLIC
+    "-//Checkstyle//DTD Checkstyle Configuration 1.3//EN"
+    "https://checkstyle.org/dtds/configuration_1_3.dtd">
+<!--
+    Adapted from Checkstyle's own configuration at commit fe1e31b84e07e728145a2d9b4bdc1a7bbfc50a3c:
+    https://github.com/checkstyle/checkstyle/blob/fe1e31b84e07e728145a2d9b4bdc1a7bbfc50a3c/config/checkstyle-checks.xml
+
+    Spotless owns source formatting. Checkstyle covers code structure, correctness,
+    naming, documentation, and complexity. Checkstyle-project-specific rules
+    (release headers, translations, import-control files, and custom XPath checks)
+    are not applicable to this backend.
+-->
+<module name="Checker">
+    <!-- ArchUnit uses the annotated field name as a readable rule description. -->
+    <module name="SuppressionSingleFilter">
+        <property name="checks" value="ConstantName"/>
+        <property name="files" value=".*[\\/]HexagonalArchitectureTest\.java"/>
+    </module>
+    <module name="TreeWalker">
+        <!-- Blocks -->
+        <module name="AvoidNestedBlocks"/>
+        <module name="EmptyBlock"/>
+        <module name="EmptyCatchBlock"/>
+        <module name="NeedBraces"/>
+
+        <!-- Class design -->
+        <module name="FinalClass"/>
+        <module name="HideUtilityClassConstructor">
+            <property name="ignoreAnnotatedBy" value="SpringBootApplication,AnalyzeClasses"/>
+        </module>
+        <module name="InnerTypeLast"/>
+        <module name="InterfaceIsType"/>
+        <module name="MutableException"/>
+        <module name="OneTopLevelClass"/>
+        <module name="SealedShouldHavePermitsList"/>
+
+        <!-- Coding -->
+        <module name="AvoidDoubleBraceInitialization"/>
+        <module name="AvoidNoArgumentSuperConstructorCall"/>
+        <module name="CovariantEquals"/>
+        <module name="DefaultComesLast"/>
+        <module name="EmptyStatement"/>
+        <module name="EqualsAvoidNull"/>
+        <module name="EqualsHashCode"/>
+        <module name="ExplicitInitialization"/>
+        <module name="FallThrough"/>
+        <module name="HiddenField">
+            <property name="ignoreConstructorParameter" value="true"/>
+            <property name="ignoreSetter" value="true"/>
+            <property name="setterCanReturnItsClass" value="true"/>
+        </module>
+        <module name="InnerAssignment"/>
+        <module name="MissingNullCaseInSwitch"/>
+        <module name="MissingOverride"/>
+        <module name="MissingSwitchDefault"/>
+        <module name="ModifiedControlVariable"/>
+        <module name="MultipleVariableDeclarations"/>
+        <module name="NestedForDepth">
+            <property name="max" value="2"/>
+        </module>
+        <module name="NestedIfDepth">
+            <property name="max" value="3"/>
+        </module>
+        <module name="NestedTryDepth"/>
+        <module name="NoClone"/>
+        <module name="NoFinalizer"/>
+        <module name="PackageDeclaration"/>
+        <module name="ParameterAssignment"/>
+        <module name="PatternVariableAssignment"/>
+        <module name="SimplifyBooleanExpression"/>
+        <module name="SimplifyBooleanReturn"/>
+        <module name="StringLiteralEquality"/>
+        <module name="UnnecessaryNullCheckWithInstanceOf"/>
+        <module name="UnnecessarySemicolonAfterOuterTypeDeclaration"/>
+        <module name="UnnecessarySemicolonAfterTypeMemberDeclaration"/>
+        <module name="UnnecessarySemicolonInEnumeration"/>
+        <module name="UnnecessarySemicolonInTryWithResources"/>
+        <module name="UnnecessaryTypeArgumentsWithRecordPattern"/>
+        <module name="UnusedPrivateField">
+            <property name="ignoreAnnotationCanonicalNames" value="java.io.Serial,lombok.Getter,jakarta.persistence.Entity"/>
+        </module>
+        <module name="UseEnhancedSwitch"/>
+        <module name="WhenShouldBeUsed"/>
+
+        <!-- Imports -->
+        <module name="AvoidModuleImport"/>
+        <module name="AvoidStarImport"/>
+        <module name="IllegalImport"/>
+        <module name="RedundantImport"/>
+        <module name="UnnecessaryFullyQualifiedType"/>
+
+        <!-- Javadoc -->
+        <module name="AtclauseOrder"/>
+        <module name="IllegalBlockTag">
+            <property name="tag" value="@author"/>
+        </module>
+        <module name="InappropriateJavadocBlockTagsOnType"/>
+        <module name="InvalidJavadocPosition"/>
+        <module name="JavadocType"/>
+        <module name="MissingJavadocType"/>
+        <module name="NonEmptyAtclauseDescription"/>
+        <module name="SummaryJavadoc"/>
+
+        <!-- Complexity and naming -->
+        <module name="BooleanExpressionComplexity">
+            <property name="max" value="7"/>
+        </module>
+        <module name="CyclomaticComplexity">
+            <property name="switchBlockAsSingleDecisionPoint" value="true"/>
+        </module>
+        <module name="MethodLength"/>
+        <module name="OuterTypeFilename"/>
+        <module name="ParameterNumber"/>
+        <module name="ConstantName"/>
+        <module name="LocalVariableName"/>
+        <module name="MemberName"/>
+        <module name="MethodName"/>
+        <module name="PackageName"/>
+        <module name="ParameterName"/>
+        <module name="TypeName"/>
+    </module>
+</module>

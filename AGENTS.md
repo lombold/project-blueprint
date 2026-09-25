@@ -12,6 +12,7 @@ mvn test -Dtest=UserControllerTest           # single test class
 mvn test -Dtest=UserControllerTest#shouldGetAllUsers  # single test method
 mvn spotless:apply                           # auto-format Java sources
 mvn spotless:check                           # verify formatting (also runs in `validate`)
+mvn checkstyle:check                         # verify code style (also runs in `validate`)
 mvn clean verify                             # full build + test (CI)
 ```
 

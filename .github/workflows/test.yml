@@ -29,6 +29,10 @@ jobs:
         working-directory: ./backend
         run: mvn spotless:check
 
+      - name: Check backend code style
+        working-directory: ./backend
+        run: mvn checkstyle:check
+
       - name: Build and test backend
         working-directory: ./backend
         run: mvn clean verify
