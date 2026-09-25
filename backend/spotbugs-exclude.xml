@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    SpotBugs exclusion filter.
+
+    SpotBugs analyses bytecode in target/classes, which contains generated code
+    alongside hand-written sources:
+      - OpenAPI generator output (DTOs, *Api interfaces, ApiUtil)
+      - MapStruct implementations (*MapperImpl)
+      - Lombok-expanded accessors and builders
+
+    Generated code is not ours to fix, so it is filtered out here rather than
+    suppressed at each site. Keep this file narrow: every exclusion is a blind
+    spot, so prefer naming generated artefacts over silencing whole rules.
+-->
+<FindBugsFilter
+        xmlns="https://github.com/spotbugs/filter/3.0.0"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="https://github.com/spotbugs/filter/3.0.0 https://raw.githubusercontent.com/spotbugs/spotbugs/4.10.4/spotbugs/etc/findbugsfilter.xsd">
+
+    <!-- OpenAPI generator: DTO package, including nested Lombok builders. -->
+    <Match>
+        <Package name="~com\.projectname\.adapter\.inbound\.controller\.dto(\..*)?"/>
+    </Match>
+
+    <!--
+        OpenAPI generator: API interfaces and ApiUtil share a package with the
+        hand-written controllers, so they are matched by name, not by package.
+    -->
+    <Match>
+        <Class name="~com\.projectname\.adapter\.inbound\.controller\.([A-Za-z0-9]+Api|ApiUtil)"/>
+    </Match>
+
+    <!-- MapStruct: generated mapper implementations. -->
+    <Match>
+        <Class name="~.*\.mapper\.[A-Za-z0-9]+MapperImpl"/>
+    </Match>
+
+</FindBugsFilter>
