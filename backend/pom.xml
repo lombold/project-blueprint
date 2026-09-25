@@ -39,6 +39,7 @@
         <spotbugs-maven-plugin.version>4.10.4.1</spotbugs-maven-plugin.version>
         <spotbugs.version>4.10.4</spotbugs.version>
         <findsecbugs-plugin.version>1.14.0</findsecbugs-plugin.version>
+        <extra-enforcer-rules.version>1.10.0</extra-enforcer-rules.version>
     </properties>
 
     <dependencies>
@@ -295,6 +296,14 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-enforcer-plugin</artifactId>
+                <dependencies>
+                    <!-- Provides the banCircularDependencies rule. -->
+                    <dependency>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>extra-enforcer-rules</artifactId>
+                        <version>${extra-enforcer-rules.version}</version>
+                    </dependency>
+                </dependencies>
                 <executions>
                     <execution>
                         <id>enforce-build-integrity</id>
@@ -323,6 +332,8 @@
                                 <dependencyConvergence/>
                                 <!-- Avoid dynamic/version-range dependency declarations. -->
                                 <requireUpperBoundDeps/>
+                                <!-- Fail if a module ends up depending on itself. -->
+                                <banCircularDependencies/>
                             </rules>
                         </configuration>
                     </execution>
