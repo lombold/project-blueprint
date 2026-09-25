@@ -55,6 +55,9 @@ spring-boot-devtools.properties
 .LSOverride
 Thumbs.db
 
+# Lefthook (local per-developer overrides of the pre-commit gate)
+lefthook-local.yml
+
 # Misc
 *.log
 .gradle

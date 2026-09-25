@@ -49,6 +49,27 @@ docker-compose up -d backend                 # containerized backend
 docker-compose up                            # full stack
 ```
 
+### Pre-commit gate (lefthook)
+```
+lefthook install                             # one-time setup per clone
+lefthook run pre-commit                      # run the gate without committing
+lefthook validate                            # check lefthook.yml is well-formed
+```
+
+`lefthook.yml` gates every commit in three stages, stopping at the first failure:
+
+1. **Auto-fix** — `mvn spotless:apply`; `eslint --fix` then `prettier --write`. Fixed files are
+   re-staged.
+2. **Verify** — `mvn verify` (backend), then `lint` + `depcruise` + unit tests (frontend).
+3. **Drift** — when `openapi.yml` changes, the regenerated Angular clients must be staged with it.
+
+Jobs are path-scoped: a backend-only commit skips the Angular checks. ~13s for a full
+monorepo commit. Production builds stay in CI.
+
+Checks run against the **working tree, not the staged index** — an unstaged violation anywhere in
+a touched module blocks the commit. The `app` module is excluded until its ESLint config is
+migrated to flat config (`verify-app` has `skip: true`).
+
 ## Architecture — Hexagonal (Backend)
 
 Base package: `com.projectname`. Three rings with strict dependency rules enforced by ArchUnit:
@@ -174,4 +195,6 @@ and `app/ios/`; modify them only for platform-specific capabilities. Web assets 
 - Branches: `feature/<summary>` or `fix/<summary>`
 - Commits: describe **why**, not what. Group backend + frontend changes per logical unit.
 - Never commit secrets or `.env` files.
+- The lefthook pre-commit gate auto-formats and verifies before every commit. Don't reach for
+  `--no-verify` to get past a failing check — fix the finding.
 - TDD cadence: red -> green -> refactor. No production code without a failing test.

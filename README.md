@@ -88,6 +88,44 @@ The backend compiles with `-Xlint:all,-processing -Werror`, so every javac lint 
 build. The `processing` category is excluded because Lombok and MapStruct leave Spring and JPA
 annotations unclaimed on every build, which no source change can fix.
 
+## Pre-Commit Quality Gate
+
+Commits are gated by [lefthook](https://lefthook.dev). The configuration lives in `lefthook.yml`.
+
+```
+brew install lefthook   # or: go install github.com/evilmartians/lefthook@latest
+lefthook install        # writes .git/hooks/pre-commit
+```
+
+`init-project.sh` installs the hooks for new projects. Existing clones need `lefthook install`
+once — git hooks are not part of a checkout.
+
+The gate runs in three stages, stopping at the first failure:
+
+1. **Auto-fix** — `mvn spotless:apply` for Java; `eslint --fix` then `prettier --write` for the
+   frontend. Repaired files are re-staged automatically.
+2. **Verify** — `mvn verify` for the backend (enforcer, Spotless, Checkstyle, `-Werror` compile,
+   tests, ArchUnit, SpotBugs + find-sec-bugs), then `lint`, `depcruise` and the unit tests for the
+   frontend.
+3. **Drift** — when `openapi.yml` changes, asserts the regenerated Angular clients are staged
+   alongside it, mirroring the CI check.
+
+Jobs are scoped by path, so a backend-only commit skips the Angular checks entirely. Typical cost
+is ~2s for a rejected commit, ~13s for a full monorepo commit. Production builds (`ng build`,
+`cap sync:prod`) stay in CI.
+
+Things worth knowing:
+
+- **Checks run against the working tree, not the staged index.** An unrelated unstaged violation
+  elsewhere in a module will block the commit, and with partially-staged files the auto-fixers
+  re-stage the whole file.
+- **`git commit --no-verify` bypasses everything.** No local hook can be mandatory; CI remains the
+  real gate.
+- **The `app` module is not yet gated.** `app/.eslintrc.json` still uses the legacy ESLint format
+  and fails on every file under ESLint 9. Migrate it to `app/eslint.config.js` (mirroring
+  `frontend/eslint.config.js`), then remove `skip: true` from the `verify-app` job.
+- Per-developer overrides go in `lefthook-local.yml`, which is git-ignored.
+
 ## Local Authentication
 
 Local development uses the Keycloak realm in `keycloak/project-name-realm.json`. Start the backend

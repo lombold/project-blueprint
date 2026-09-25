@@ -1,0 +1,124 @@
+# Pre-commit quality gate.
+#
+# Stage 1 auto-fixes everything that is auto-fixable and re-stages the result.
+# Stage 2 runs the full verification suite. Stage 3 asserts the generated
+# OpenAPI clients are in sync. Stages run in order and stop at the first
+# failure; jobs within a stage run in parallel where that is safe.
+#
+# Jobs are scoped by `glob`, so a backend-only commit never pays for the
+# Angular checks and vice versa. Builds (`ng build`, `cap sync:prod`) are
+# deliberately left to CI.
+#
+# Install with `lefthook install`. Bypass with `git commit --no-verify` —
+# CI is the real gate.
+
+min_version: 2.0.0
+
+output:
+  - meta
+  - summary
+  - failure
+
+pre-commit:
+  piped: true # stop at the first failing stage
+
+  jobs:
+    # ─── Stage 1: auto-fix ────────────────────────────────────────────────
+    - name: autofix
+      group:
+        parallel: true
+        jobs:
+          # Whole-module rather than per-file: `-DspotlessFiles` takes path
+          # regexes and `mvn verify` re-checks everything in stage 2 anyway.
+          - name: backend-format
+            root: backend/
+            glob: "*.java"
+            run: mvn -q spotless:apply
+            stage_fixed: true
+
+          # Sequential: prettier and eslint must never rewrite a file at the
+          # same time. ESLint first, prettier last so prettier has final say.
+          - name: frontend-format
+            group:
+              parallel: false
+              jobs:
+                # `|| true` — this stage fixes, it does not judge. Unfixable
+                # findings are reported by `bun run lint` in stage 2, which
+                # gives a clearer message than a half-failed autofix.
+                - name: eslint-fix
+                  root: frontend/
+                  glob: "*.{ts,html}"
+                  run: bunx eslint --fix --no-error-on-unmatched-pattern {staged_files} || true
+                  stage_fixed: true
+
+                - name: prettier
+                  root: frontend/
+                  glob: "*.{ts,html,scss,css,json,md,yml,yaml}"
+                  run: bunx prettier --write {staged_files}
+                  stage_fixed: true
+
+    # ─── Stage 2: verify ──────────────────────────────────────────────────
+    #
+    # Backend runs before the Angular jobs, not alongside them: `mvn verify`
+    # regenerates frontend/src/app/core/api, and linting those files while
+    # they are being written is a race.
+    #
+    # Covers enforcer, spotless:check, checkstyle, -Werror compile, tests,
+    # ArchUnit and SpotBugs + find-sec-bugs.
+    - name: verify-backend
+      root: backend/
+      glob: "*.{java,xml,yml,yaml,sql,properties}"
+      run: mvn verify
+
+    - name: verify-frontend
+      group:
+        parallel: true
+        jobs:
+          - name: lint
+            root: frontend/
+            glob: "*.{ts,html}"
+            run: bun run lint
+
+          - name: depcruise
+            root: frontend/
+            glob: "*.ts"
+            run: bun run depcruise
+
+          - name: test
+            root: frontend/
+            glob: "*.{ts,html}"
+            run: bun run test -- --watch=false
+
+    # TODO: re-enable once app/.eslintrc.json is migrated to flat config
+    # (app/eslint.config.js), mirroring frontend/eslint.config.js. `bun run
+    # lint` currently fails on every file with "Parsing error: Maximum call
+    # stack size exceeded" — ESLint 9 with a legacy eslintrc. depcruise and
+    # the tests already pass; drop `skip` to switch this on.
+    - name: verify-app
+      skip: true
+      group:
+        parallel: true
+        jobs:
+          - name: lint
+            root: app/
+            glob: "*.{ts,html}"
+            run: bun run lint
+
+          - name: depcruise
+            root: app/
+            glob: "*.ts"
+            run: bun run depcruise
+
+          - name: test
+            root: app/
+            glob: "*.{ts,html}"
+            run: bun run test -- --watch=false
+
+    # ─── Stage 3: generated client drift ──────────────────────────────────
+    #
+    # Mirrors the CI check. Runs after stage 2 so it sees the clients that
+    # `mvn verify` just regenerated: change openapi.yml and you must stage
+    # the regenerated clients along with it.
+    - name: openapi-client-drift
+      glob: "backend/src/main/resources/openapi.yml"
+      run: git diff --exit-code -- frontend/src/app/core/api app/src/app/core/api

@@ -33,4 +33,5 @@ maven verify: enforcer:enforce, spotless:check, checkstyle:check
 
 => pre-commit hooks
 
-
+* Stufe 1 (5 sek): autofix (spotless:apply, prettier --write, eslint --fix)
+* Stufe 2 (30 sek): full verification (maven verify, eslint, stylelint)

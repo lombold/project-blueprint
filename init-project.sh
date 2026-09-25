@@ -16,11 +16,13 @@
 #   4. Renames files and directories
 #   5. Regenerates OpenAPI clients for the renamed contract
 #   6. Replaces template placeholders in README.md
-#   7. Re-points the git origin to the new GitHub repo
-#   8. Creates the GitHub repo and pushes
+#   7. Installs the lefthook pre-commit quality gate
+#   8. Re-points the git origin to the new GitHub repo
+#   9. Creates the GitHub repo and pushes
 #
 # Prerequisites:
 #   - git, gh (GitHub CLI, authenticated), Java 25, Maven, sed, find
+#   - lefthook (optional; the pre-commit gate is skipped if absent)
 #
 set -euo pipefail
 
@@ -351,7 +353,22 @@ All placeholder references updated to ${NEW_KEBAB}."
   success "Rename committed"
 fi
 
-# ─── Step 6: Update git remote ──────────────────────────────────────────────
+# ─── Step 6: Install git hooks ──────────────────────────────────────────────
+#
+# Installed after the rename commit on purpose: the gate runs the full
+# verification suite, and the rename commit should not have to wait on it.
+
+info "Installing git hooks..."
+
+if command -v lefthook >/dev/null 2>&1; then
+  lefthook install
+  success "Pre-commit quality gate installed"
+else
+  warn "lefthook not found — pre-commit quality gate NOT installed"
+  warn "Install it (brew install lefthook), then run: lefthook install"
+fi
+
+# ─── Step 7: Update git remote ──────────────────────────────────────────────
 
 info "Updating git remote..."
 
@@ -359,7 +376,7 @@ git remote set-url origin "git@github.com:${GITHUB_OWNER}/${NEW_KEBAB}.git"
 
 success "Remote set to ${GITHUB_OWNER}/${NEW_KEBAB}"
 
-# ─── Step 7: Create GitHub repo and push ─────────────────────────────────────
+# ─── Step 8: Create GitHub repo and push ─────────────────────────────────────
 
 info "Creating GitHub repository..."
 
