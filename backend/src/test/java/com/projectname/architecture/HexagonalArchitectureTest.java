@@ -69,7 +69,7 @@ class HexagonalArchitectureTest {
             .resideInAPackage("..adapter.inbound..")
             .should()
             .dependOnClassesThat()
-            .resideInAPackage("..application.port.out..");
+            .resideInAPackage("com.projectname.application.port");
 
     @ArchTest
     static final ArchRule outbound_adapters_should_not_depend_on_inbound_adapters = noClasses()
@@ -98,7 +98,7 @@ class HexagonalArchitectureTest {
     @ArchTest
     static final ArchRule application_ports_should_be_interfaces = classes()
             .that()
-            .resideInAnyPackage("..application.port.in..", "..application.port.out..")
+            .resideInAnyPackage("..application.port.in..", "com.projectname.application.port")
             .should()
             .beInterfaces();
 
@@ -165,7 +165,7 @@ class HexagonalArchitectureTest {
                     final var writes = method.getMethodCallsFromSelf().stream()
                             .filter(call -> call.getTargetOwner()
                                             .getPackageName()
-                                            .equals("com.projectname.application.port.out")
+                                            .equals("com.projectname.application.port")
                                     && (call.getTarget().getName().startsWith("save")
                                             || call.getTarget().getName().startsWith("delete")))
                             .toList();
@@ -250,7 +250,7 @@ class HexagonalArchitectureTest {
                                     .iterator()
                                     .next()
                                     .getPackageName()
-                                    .equals("com.projectname.application.port.out");
+                                    .equals("com.projectname.application.port");
                     events.add(new SimpleConditionEvent(
                             adapter, valid, adapter.getName() + " must implement one outbound port"));
                 }

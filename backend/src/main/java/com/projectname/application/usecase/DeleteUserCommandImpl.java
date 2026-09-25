@@ -1,7 +1,7 @@
 package com.projectname.application.usecase;
 
+import com.projectname.application.port.UserPort;
 import com.projectname.application.port.in.DeleteUserCommand;
-import com.projectname.application.port.out.UserPort;
 import com.projectname.domain.exception.ResourceNotFoundException;
 import com.projectname.domain.value.UserId;
 import lombok.RequiredArgsConstructor;
