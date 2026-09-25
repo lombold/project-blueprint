@@ -4,12 +4,11 @@ import com.projectname.adapter.outbound.persistence.mapper.UserJpaMapper;
 import com.projectname.application.port.out.UserPort;
 import com.projectname.domain.entity.User;
 import com.projectname.domain.value.UserId;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
-
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Component;
 
 /**
  * Implements user persistence through the JPA repository.

@@ -3,10 +3,9 @@ package com.projectname.application.usecase;
 import com.projectname.application.port.in.ListUsersQuery;
 import com.projectname.application.port.out.UserPort;
 import com.projectname.domain.entity.User;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 /**
  * Loads all users.

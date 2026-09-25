@@ -2,7 +2,6 @@ package com.projectname.application.port.out;
 
 import com.projectname.domain.entity.User;
 import com.projectname.domain.value.UserId;
-
 import java.util.List;
 import java.util.Optional;
 
