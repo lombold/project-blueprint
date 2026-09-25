@@ -1,15 +1,13 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="Application" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot">
-    <option name="ACTIVE_PROFILES" value="dev" />
-    <additionalParameters>
-      <param>
-        <option name="enabled" value="true" />
-        <option name="name" value="server.port" />
-        <option name="value" value="8081" />
-      </param>
-    </additionalParameters>
-    <module name="project-name" />
+    <module name="project-name.main" />
     <option name="SPRING_BOOT_MAIN_CLASS" value="com.projectname.ProjectNameApplication" />
+    <extension name="coverage">
+      <pattern>
+        <option name="PATTERN" value="com.projectname.*" />
+        <option name="ENABLED" value="true" />
+      </pattern>
+    </extension>
     <method v="2">
       <option name="Make" enabled="true" />
     </method>

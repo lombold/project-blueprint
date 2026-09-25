@@ -184,10 +184,27 @@
                     </annotationProcessorPaths>
 
                     <compilerArgs>
-                        <arg>-Amapstruct.defaultComponentModel=spring</arg>
-                        <arg>-Amapstruct.unmappedTargetPolicy=ERROR</arg>
+                        <!-- All javac lint categories except `processing`: Lombok and
+                             MapStruct leave Spring/JPA annotations unclaimed, which that
+                             category reports on every build and no source change can fix. -->
+                        <arg>-Xlint:all,-processing</arg>
+                        <!-- Lint findings fail the build. -->
+                        <arg>-Werror</arg>
                     </compilerArgs>
                 </configuration>
+                <executions>
+                    <execution>
+                        <id>default-compile</id>
+                        <configuration>
+                            <!-- Main sources only: no test source declares a MapStruct
+                                 mapper, so javac would warn about unclaimed -A options. -->
+                            <compilerArgs combine.children="append">
+                                <arg>-Amapstruct.defaultComponentModel=spring</arg>
+                                <arg>-Amapstruct.unmappedTargetPolicy=ERROR</arg>
+                            </compilerArgs>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
             <plugin>
                 <groupId>org.openapitools</groupId>
@@ -213,6 +230,7 @@
                                 <dateLibrary>java8</dateLibrary>
                                 <openApiNullable>false</openApiNullable>
                                 <additionalModelTypeAnnotations>
+                                    @SuppressWarnings("deprecation")
                                     @lombok.Data
                                     @lombok.Builder
                                     @lombok.AllArgsConstructor

@@ -8,6 +8,8 @@ import java.util.Objects;
  */
 public final class UserId implements Serializable {
 
+    private static final long serialVersionUID = 1L;
+
     private final Long value;
 
     private UserId(final Long value) {

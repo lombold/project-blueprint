@@ -84,6 +84,10 @@ Backend Checkstyle rules in `backend/checkstyle.xml` are adapted from the pinned
 project configuration. Spotless remains the Java formatter; Checkstyle checks code structure,
 naming, documentation, and complexity.
 
+The backend compiles with `-Xlint:all,-processing -Werror`, so every javac lint warning fails the
+build. The `processing` category is excluded because Lombok and MapStruct leave Spring and JPA
+annotations unclaimed on every build, which no source change can fix.
+
 ## Local Authentication
 
 Local development uses the Keycloak realm in `keycloak/project-name-realm.json`. Start the backend
