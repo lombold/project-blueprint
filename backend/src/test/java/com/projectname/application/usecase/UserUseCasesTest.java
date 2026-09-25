@@ -23,6 +23,7 @@ import static org.mockito.Mockito.*;
 class UserUseCasesTest {
 
     @Mock
+
     private UserPort userPort;
 
     @Test
