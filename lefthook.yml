@@ -36,19 +36,26 @@ pre-commit:
             run: mvn -q spotless:apply
             stage_fixed: true
 
-          # Sequential: prettier and eslint must never rewrite a file at the
-          # same time. ESLint first, prettier last so prettier has final say.
+          # Sequential: these fixers must never rewrite the same file at the
+          # same time. Prettier runs last so it has the final say on layout.
           - name: frontend-format
             group:
               parallel: false
               jobs:
                 # `|| true` — this stage fixes, it does not judge. Unfixable
-                # findings are reported by `bun run lint` in stage 2, which
-                # gives a clearer message than a half-failed autofix.
+                # findings are reported by `bun run lint` / `bun run stylelint`
+                # in stage 2, which gives a clearer message than a half-failed
+                # autofix.
                 - name: eslint-fix
                   root: frontend/
                   glob: "*.{ts,html}"
                   run: bunx eslint --fix --no-error-on-unmatched-pattern {staged_files} || true
+                  stage_fixed: true
+
+                - name: stylelint-fix
+                  root: frontend/
+                  glob: "*.{css,scss}"
+                  run: bunx stylelint --fix {staged_files} || true
                   stage_fixed: true
 
                 - name: prettier
@@ -56,6 +63,13 @@ pre-commit:
                   glob: "*.{ts,html,scss,css,json,md,yml,yaml}"
                   run: bunx prettier --write {staged_files}
                   stage_fixed: true
+
+          # The app module has no prettier script, so stylelint stands alone.
+          - name: app-format
+            root: app/
+            glob: "*.{css,scss}"
+            run: bunx stylelint --fix {staged_files} || true
+            stage_fixed: true
 
     # ─── Stage 2: verify ──────────────────────────────────────────────────
     #
@@ -88,6 +102,18 @@ pre-commit:
             root: frontend/
             glob: "*.{ts,html}"
             run: bun run test -- --watch=false
+
+          - name: stylelint
+            root: frontend/
+            glob: "*.{css,scss}"
+            run: bun run stylelint
+
+    # Stylelint does not depend on the broken app ESLint config, so app
+    # stylesheets are gated now rather than waiting on that migration.
+    - name: verify-app-style
+      root: app/
+      glob: "*.{css,scss}"
+      run: bun run stylelint
 
     # TODO: re-enable once app/.eslintrc.json is migrated to flat config
     # (app/eslint.config.js), mirroring frontend/eslint.config.js. `bun run

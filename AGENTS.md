@@ -25,6 +25,8 @@ bun run test -- --watch=false                # Vitest unit tests
 bun run test -- --watch=false --include **/users.page.spec.ts  # exact file
 bun run test:ci                              # tests with V8 coverage
 bun run lint                                 # lint
+bun run stylelint                            # SCSS/CSS lint
+bun run stylelint:fix                        # auto-fix SCSS/CSS findings
 bun run depcruise                            # boundary checks
 bun run e2e                                  # Playwright E2E (Chromium)
 ```
@@ -37,6 +39,8 @@ bun run build                                # production web build to www/
 bun run test -- --watch=false                # Vitest unit tests
 bun run test:ci                              # tests with V8 coverage
 bun run lint                                 # lint
+bun run stylelint                            # SCSS/CSS lint
+bun run stylelint:fix                        # auto-fix SCSS/CSS findings
 bun run depcruise                            # boundary checks
 bun run sync                                 # build and sync both native projects
 bun run android                              # open the Android project
@@ -58,17 +62,19 @@ lefthook validate                            # check lefthook.yml is well-formed
 
 `lefthook.yml` gates every commit in three stages, stopping at the first failure:
 
-1. **Auto-fix** — `mvn spotless:apply`; `eslint --fix` then `prettier --write`. Fixed files are
-   re-staged.
-2. **Verify** — `mvn verify` (backend), then `lint` + `depcruise` + unit tests (frontend).
+1. **Auto-fix** — `mvn spotless:apply`; `eslint --fix`, `stylelint --fix`, then `prettier --write`.
+   Fixed files are re-staged.
+2. **Verify** — `mvn verify` (backend), then `lint` + `stylelint` + `depcruise` + unit tests
+   (frontend), plus `stylelint` for the app.
 3. **Drift** — when `openapi.yml` changes, the regenerated Angular clients must be staged with it.
 
 Jobs are path-scoped: a backend-only commit skips the Angular checks. ~13s for a full
 monorepo commit. Production builds stay in CI.
 
 Checks run against the **working tree, not the staged index** — an unstaged violation anywhere in
-a touched module blocks the commit. The `app` module is excluded until its ESLint config is
-migrated to flat config (`verify-app` has `skip: true`).
+a touched module blocks the commit. The app module's ESLint, depcruise and test jobs are excluded
+until its ESLint config is migrated to flat config (`verify-app` has `skip: true`); its stylelint
+job (`verify-app-style`) is active.
 
 ## Architecture — Hexagonal (Backend)
 
@@ -171,6 +177,9 @@ and `app/ios/`; modify them only for platform-specific capabilities. Web assets 
 - **Test setup**: `TestBed.configureTestingModule({ imports: [Component], providers: [...mocks] })`. Mock services with `vi.fn()`.
 - **Tailwind CSS v4**: utility-first, no custom CSS unless unavoidable. No separate `tailwind.config` file (v4 PostCSS plugin).
 - **SCSS**: style language is `scss` (per `angular.json`), but prefer Tailwind utilities over custom SCSS.
+- **Stylesheet linting**: Stylelint (`stylelint-config-standard-scss`) owns SCSS/CSS correctness;
+  Prettier still owns formatting. Config in `frontend/.stylelintrc.json` and `app/.stylelintrc.json`.
+  The frontend config allows Tailwind v4's CSS-first at-rules (`@theme`, `@apply`, `@utility`, …).
 
 ## Error Handling
 

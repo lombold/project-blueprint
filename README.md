@@ -102,11 +102,12 @@ once — git hooks are not part of a checkout.
 
 The gate runs in three stages, stopping at the first failure:
 
-1. **Auto-fix** — `mvn spotless:apply` for Java; `eslint --fix` then `prettier --write` for the
-   frontend. Repaired files are re-staged automatically.
+1. **Auto-fix** — `mvn spotless:apply` for Java; `eslint --fix`, `stylelint --fix` and then
+   `prettier --write` for the frontend; `stylelint --fix` for the app. Repaired files are
+   re-staged automatically.
 2. **Verify** — `mvn verify` for the backend (enforcer, Spotless, Checkstyle, `-Werror` compile,
-   tests, ArchUnit, SpotBugs + find-sec-bugs), then `lint`, `depcruise` and the unit tests for the
-   frontend.
+   tests, ArchUnit, SpotBugs + find-sec-bugs), then `lint`, `stylelint`, `depcruise` and the unit
+   tests for the frontend, plus `stylelint` for the app.
 3. **Drift** — when `openapi.yml` changes, asserts the regenerated Angular clients are staged
    alongside it, mirroring the CI check.
 
@@ -121,9 +122,13 @@ Things worth knowing:
   re-stage the whole file.
 - **`git commit --no-verify` bypasses everything.** No local hook can be mandatory; CI remains the
   real gate.
-- **The `app` module is not yet gated.** `app/.eslintrc.json` still uses the legacy ESLint format
-  and fails on every file under ESLint 9. Migrate it to `app/eslint.config.js` (mirroring
+- **The `app` module is only partly gated.** Its stylelint job is active; its ESLint, depcruise
+  and test jobs are not. `app/.eslintrc.json` still uses the legacy ESLint format and fails on
+  every file under ESLint 9. Migrate it to `app/eslint.config.js` (mirroring
   `frontend/eslint.config.js`), then remove `skip: true` from the `verify-app` job.
+- **Adding a frontend dependency needs `frozenLockfile` relaxed.** `frontend/bunfig.toml` sets
+  `frozenLockfile = true`, which blocks `bun install` and `bun add` alike; neither a CLI flag nor
+  an env var overrides it. Flip it to `false` in `bunfig.toml`, install, then flip it back.
 - Per-developer overrides go in `lefthook-local.yml`, which is git-ignored.
 
 ## Local Authentication

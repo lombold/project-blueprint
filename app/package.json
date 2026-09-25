@@ -11,6 +11,8 @@
     "test": "ng test",
     "test:ci": "ng test --coverage",
     "lint": "ng lint",
+    "stylelint": "stylelint \"src/**/*.{css,scss}\"",
+    "stylelint:fix": "stylelint --fix \"src/**/*.{css,scss}\"",
     "depcruise": "dependency-cruise --config .dependency-cruiser.cjs src/app",
     "sync": "bun run sync:dev",
     "sync:dev": "bun run build:dev && cap sync",
@@ -65,6 +67,8 @@
     "eslint-plugin-prefer-arrow": "1.2.2",
     "jsdom": "^27.4.0",
     "prettier": "^3.8.3",
+    "stylelint": "^17.15.0",
+    "stylelint-config-standard-scss": "^17.0.0",
     "typescript": "~5.9.0",
     "vitest": "^4.1.6"
   },

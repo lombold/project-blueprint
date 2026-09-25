@@ -15,7 +15,6 @@ import { ClickOutside } from '@shared/directives/click-outside';
     RouterOutlet,
   ],
   templateUrl: './app.html',
-  styleUrl: './app.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class App {
