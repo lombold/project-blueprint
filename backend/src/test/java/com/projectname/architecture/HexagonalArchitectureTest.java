@@ -250,7 +250,7 @@ class HexagonalArchitectureTest {
                                     .iterator()
                                     .next()
                                     .getPackageName()
-                                    .equals("com.projectname.application.port");
+                                    .equals("com.projectname.application.port.out");
                     events.add(new SimpleConditionEvent(
                             adapter, valid, adapter.getName() + " must implement one outbound port"));
                 }
