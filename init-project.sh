@@ -380,12 +380,15 @@ success "Remote set to ${GITHUB_OWNER}/${NEW_KEBAB}"
 
 info "Creating GitHub repository..."
 
+# origin is already re-pointed in Step 7, so create the repo without --source/--push
+# (gh would otherwise fail trying to add an origin remote that already exists).
 if gh repo view "${GITHUB_OWNER}/${NEW_KEBAB}" >/dev/null 2>&1; then
   warn "Repository ${GITHUB_OWNER}/${NEW_KEBAB} already exists, skipping creation"
-  git push -u origin main
 else
-  gh repo create "${GITHUB_OWNER}/${NEW_KEBAB}" --private --source=. --push
+  gh repo create "${GITHUB_OWNER}/${NEW_KEBAB}" --private
 fi
+
+git push -u origin main
 
 success "Pushed to ${GITHUB_OWNER}/${NEW_KEBAB}"
 
